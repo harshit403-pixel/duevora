@@ -6,7 +6,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import env from "./shared/config/env.config.js";
+import env from "../config/env.config.js";
 
 // function to apply middlewares to the app
 function applyMiddlewares(app) {

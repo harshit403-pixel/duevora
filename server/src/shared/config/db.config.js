@@ -4,12 +4,12 @@ import env from "./env.config.js";
 import logger from "./logger.config.js";
 
 // function to connect to the database
-function connectDB() {
+async function connectDB() {
 
     try {
 
         // connecting to the database
-        mongoose.connect(env.MONGO_URI);
+        await mongoose.connect(env.MONGO_URI);
         logger.info("Connected to the database");
 
     }
