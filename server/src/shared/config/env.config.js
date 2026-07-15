@@ -11,6 +11,17 @@ const envSchema = z.object({
     PORT: z.coerce.number().default(envConstants.PORT),
     NODE_ENV: z.enum(["development", "production", "test"]).default(envConstants.NODE_ENV),
     MONGO_URI: z.string().default(envConstants.MONGO_URI),
+    ACCESS_TOKEN_SECRET: z.string().default(envConstants.ACCESS_TOKEN_SECRET),
+    REFRESH_TOKEN_SECRET: z.string().default(envConstants.REFRESH_TOKEN_SECRET),
+    FRONTEND_URL: z.string().url().default(envConstants.FRONTEND_URL),
+    SMTP_HOST: z.string().default(envConstants.SMTP_HOST),
+    SMTP_PORT: z.coerce.number().default(envConstants.SMTP_PORT),
+    SMTP_USER: z.string().default(envConstants.SMTP_USER),
+    SMTP_PASS: z.string().default(envConstants.SMTP_PASS),
+    SENDING_USER: z.string().default(envConstants.SENDING_USER),
+    GOOGLE_CLIENT_ID: z.string().default(envConstants.GOOGLE_CLIENT_ID),
+    GOOGLE_CLIENT_SECRET: z.string().default(envConstants.GOOGLE_CLIENT_SECRET),
+    GOOGLE_REDIRECT_URI: z.string().url().default(envConstants.GOOGLE_REDIRECT_URI),
 });
 
 // parsing and validating environment variables
@@ -24,4 +35,4 @@ if (!parsedEnv.success) {
 // getting the validated environment variables
 const env = parsedEnv.data;
 
-export default env;
+export default env;
