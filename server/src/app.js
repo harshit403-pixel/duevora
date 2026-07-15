@@ -2,6 +2,8 @@
 import express from "express";
 import router from "./shared/routers/index.router.js";
 import applyMiddlewares from "./shared/middlewares/index.middleware.js";
+import notFoundHandler from "./shared/middlewares/NotFound.middleware.js";
+import errorHandler from "./shared/middlewares/error.middleware.js";
 
 // function to make the app 
 function createApp() {
@@ -15,9 +17,15 @@ function createApp() {
     // adding the index router to the app
     app.use("/api", router);
 
+    // not found middleware
+    app.use(notFoundHandler);
+
+    // error handling middleware
+    app.use(errorHandler);
+
     // returning the app
     return app;
 
 }
 
-export default createApp;
+export default createApp;
