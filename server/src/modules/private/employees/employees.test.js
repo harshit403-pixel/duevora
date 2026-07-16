@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { MongoMemoryReplSet } from "mongodb-memory-server";
 import request from "supertest";
 
 // Mock sending mail
@@ -25,7 +25,12 @@ let orgId;
 let adminRoleId;
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    // MongoMemoryReplSet is required to support multi-document transactions in tests
+    mongoServer = await MongoMemoryReplSet.create({
+        replSet: {
+            storageEngine: "wiredTiger"
+        }
+    });
     const uri = mongoServer.getUri();
     await mongoose.connect(uri);
     app = createApp();
@@ -297,6 +302,76 @@ describe("Employee Member Invitation & Creation Integration Tests", () => {
                 });
 
             expect(res.status).toBe(400);
+        });
+    });
+
+    describe("POST /api/employees/bulk-import", () => {
+        it("should successfully import multiple employees in transaction", async () => {
+            const res = await request(app)
+                .post("/api/employees/bulk-import")
+                .set("Authorization", `Bearer ${adminUserToken}`)
+                .send({
+                    employees: [
+                        { employeeCode: "EMP-101", firstName: "Bob", lastName: "Stone", email: "bob.stone@example.com" },
+                        { employeeCode: "EMP-102", firstName: "Charlie", lastName: "Brown", email: "charlie.brown@example.com" }
+                    ]
+                });
+
+            expect(res.status).toBe(201);
+            expect(res.body.success).toBe(true);
+            expect(res.body.data.length).toBe(2);
+
+            // Verify both exist in DB
+            const emp1 = await Employee.findOne({ employeeCode: "EMP-101" });
+            expect(emp1).toBeDefined();
+            expect(emp1.firstName).toBe("Bob");
+
+            const emp2 = await Employee.findOne({ employeeCode: "EMP-102" });
+            expect(emp2).toBeDefined();
+            expect(emp2.firstName).toBe("Charlie");
+        });
+
+        it("should fail validation if there are local duplicates in payload list", async () => {
+            const res = await request(app)
+                .post("/api/employees/bulk-import")
+                .set("Authorization", `Bearer ${adminUserToken}`)
+                .send({
+                    employees: [
+                        { employeeCode: "EMP-101", firstName: "Bob", lastName: "Stone", email: "bob.stone@example.com" },
+                        { employeeCode: "EMP-101", firstName: "Charlie", lastName: "Brown", email: "charlie.brown@example.com" } // code collision
+                    ]
+                });
+
+            expect(res.status).toBe(400);
+            expect(res.body.message).toContain("Duplicate employee code found in import list");
+        });
+
+        it("should roll back transaction and import nothing if any single record conflicts with database", async () => {
+            // Seed one employee in database first
+            await Employee.create({
+                organizationId: orgId,
+                employeeCode: "EMP-EXIST",
+                firstName: "Existing",
+                lastName: "User",
+                email: "existing@example.com"
+            });
+
+            // Attempt bulk import containing one new and one duplicate employeeCode
+            const res = await request(app)
+                .post("/api/employees/bulk-import")
+                .set("Authorization", `Bearer ${adminUserToken}`)
+                .send({
+                    employees: [
+                        { employeeCode: "EMP-NEW-ROLLBACK", firstName: "New", lastName: "Guy", email: "newguy@example.com" },
+                        { employeeCode: "EMP-EXIST", firstName: "Duplicate", lastName: "Code", email: "duplicatecode@example.com" }
+                    ]
+                });
+
+            expect(res.status).toBe(409); // conflict because of EMP-EXIST
+
+            // Verify that the NEW employee was rolled back and is NOT created in database
+            const dbNewEmployee = await Employee.findOne({ employeeCode: "EMP-NEW-ROLLBACK" });
+            expect(dbNewEmployee).toBeNull();
         });
     });
 

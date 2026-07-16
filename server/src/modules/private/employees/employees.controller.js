@@ -1,5 +1,6 @@
 // Importing modules
 import crypto from "crypto";
+import mongoose from "mongoose";
 import TokenDao from "../../../shared/dao/token.dao.js";
 import RoleDao from "../../../shared/dao/role.dao.js";
 import EmployeeDao from "../../../shared/dao/employee.dao.js";
@@ -158,6 +159,129 @@ class EmployeesController {
         });
 
         return Created(res, "Employee profile created successfully", employee);
+
+    }
+
+    // bulk import employees using transactions
+    bulkImportEmployees = async (req, res) => {
+
+        const { employees } = req.body;
+        const organizationId = req.user.organizationId;
+
+        // checking organization isolation constraints
+        if (!organizationId) {
+
+            throw new Forbidden("User must belong to an organization to bulk import employees.");
+
+        }
+
+        // tracking unique codes and emails in the input payload to check for local duplicates
+        const inputCodes = new Set();
+        const inputEmails = new Set();
+
+        for (const emp of employees) {
+
+            if (inputCodes.has(emp.employeeCode)) {
+
+                throw new BadRequest(`Duplicate employee code found in import list: ${emp.employeeCode}`);
+
+            }
+
+            if (inputEmails.has(emp.email.toLowerCase())) {
+
+                throw new BadRequest(`Duplicate email found in import list: ${emp.email}`);
+
+            }
+
+            inputCodes.add(emp.employeeCode);
+            inputEmails.add(emp.email.toLowerCase());
+
+        }
+
+        // starting a mongodb transaction session
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+
+            const importedEmployees = [];
+
+            for (const emp of employees) {
+
+                // verifying that employeeCode is unique within organization
+                const existingCode = await this.employeeDao.findOne({
+                    organizationId,
+                    employeeCode: emp.employeeCode
+                }, session);
+
+                if (existingCode) {
+
+                    throw new Conflict(`Employee code already exists: ${emp.employeeCode}`);
+
+                }
+
+                // verifying that email is globally unique in employee profiles
+                const existingEmail = await this.employeeDao.findOne({
+                    email: emp.email.toLowerCase()
+                }, session);
+
+                if (existingEmail) {
+
+                    throw new Conflict(`Employee with this email already exists: ${emp.email}`);
+
+                }
+
+                // verifying department context if provided
+                if (emp.departmentId) {
+
+                    const department = await this.departmentDao.findOne({
+                        _id: emp.departmentId,
+                        organizationId
+                    }, session);
+
+                    if (!department) {
+
+                        throw new BadRequest(`Invalid department ID: ${emp.departmentId}`);
+
+                    }
+
+                }
+
+                // creating employee record using employee dao
+                const createdEmp = await this.employeeDao.create({
+                    userId: emp.userId || null,
+                    organizationId,
+                    employeeCode: emp.employeeCode,
+                    firstName: emp.firstName,
+                    lastName: emp.lastName,
+                    email: emp.email.toLowerCase(),
+                    phone: emp.phone || "",
+                    status: emp.status || "active",
+                    joiningDate: emp.joiningDate || null,
+                    departmentId: emp.departmentId || null
+                }, session);
+
+                importedEmployees.push(createdEmp);
+
+            }
+
+            // committing transaction and saving all documents
+            await session.commitTransaction();
+
+            return Created(res, "Employees imported successfully", importedEmployees);
+
+        } catch (error) {
+
+            // aborting transaction on any failure
+            await session.abortTransaction();
+            throw error;
+
+        } finally {
+
+            // ending the session
+            session.endSession();
+
+        }
 
     }
 
