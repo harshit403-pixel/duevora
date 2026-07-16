@@ -1,7 +1,9 @@
 // Importing modules
 import CustomerDao from "../../../shared/dao/customer.dao.js";
 import Conflict from "../../../shared/errors/Conflict.error.js";
+import NotFound from "../../../shared/errors/NotFound.error.js";
 import Created from "../../../shared/responses/Created.response.js";
+import Ok from "../../../shared/responses/Ok.response.js";
 
 // class to handle customer operations
 class CustomersController {
@@ -107,6 +109,77 @@ class CustomersController {
                 pages
             }
         });
+
+    }
+
+    // get customer details by id
+    getCustomerDetails = async (req, res) => {
+
+        const { customerId } = req.params;
+        const organizationId = req.user.organizationId;
+
+        // finding the customer profile within the organization context
+        const customer = await this.customerDao.findOne({
+            _id: customerId,
+            organizationId
+        });
+
+        if (!customer) {
+
+            throw new NotFound("Customer profile not found in your organization.");
+
+        }
+
+        return Ok(res, "Customer details retrieved successfully", customer);
+
+    }
+
+    // update customer profile details
+    updateCustomer = async (req, res) => {
+
+        const { customerId } = req.params;
+        const { name, email, phone, address, taxNumber, status } = req.body;
+        const organizationId = req.user.organizationId;
+
+        // verifying target customer belongs to caller's organization context
+        const customer = await this.customerDao.findOne({ _id: customerId, organizationId });
+
+        if (!customer) {
+
+            throw new NotFound("Customer profile not found in your organization.");
+
+        }
+
+        // if email is updated, verifying that it is unique within the organization context
+        if (email && email.toLowerCase() !== customer.email) {
+
+            const existingCustomer = await this.customerDao.findOne({
+                organizationId,
+                email: email.toLowerCase(),
+                _id: {
+                    $ne: customerId
+                }
+            });
+
+            if (existingCustomer) {
+
+                throw new Conflict("Customer with this email already exists in your organization.");
+
+            }
+
+        }
+
+        // updating customer record using customer dao
+        const updatedCustomer = await this.customerDao.updateById(customerId, {
+            name: name !== undefined ? name : customer.name,
+            email: email !== undefined ? email.toLowerCase() : customer.email,
+            phone: phone !== undefined ? phone : customer.phone,
+            address: address !== undefined ? address : customer.address,
+            taxNumber: taxNumber !== undefined ? taxNumber : customer.taxNumber,
+            status: status !== undefined ? status : customer.status
+        });
+
+        return Ok(res, "Customer profile updated successfully", updatedCustomer);
 
     }
 

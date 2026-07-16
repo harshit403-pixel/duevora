@@ -53,6 +53,12 @@ beforeEach(async () => {
         module: "customers"
     });
 
+    await Permission.create({
+        name: "Update Customers",
+        code: "CUSTOMERS.UPDATE",
+        module: "customers"
+    });
+
     // Create an Admin user
     const adminUser = await User.create({
         name: "Admin User",
@@ -314,6 +320,143 @@ describe("Customers Management Integration Tests", () => {
             const res = await request(app)
                 .get("/api/customers")
                 .set("Authorization", `Bearer ${userWithoutPermToken}`);
+
+            expect(res.status).toBe(403);
+        });
+    });
+
+    describe("GET /api/customers/:customerId", () => {
+        let testCustomer;
+
+        beforeEach(async () => {
+            testCustomer = await Customer.create({
+                name: "Alpha Corp",
+                email: "alpha@corp.com",
+                organizationId: orgId
+            });
+        });
+
+        it("should successfully retrieve customer details", async () => {
+            const res = await request(app)
+                .get(`/api/customers/${testCustomer._id}`)
+                .set("Authorization", `Bearer ${adminUserToken}`);
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.data._id.toString()).toBe(testCustomer._id.toString());
+            expect(res.body.data.name).toBe("Alpha Corp");
+        });
+
+        it("should return 404 not found if customer ID does not exist", async () => {
+            const fakeId = new mongoose.Types.ObjectId();
+            const res = await request(app)
+                .get(`/api/customers/${fakeId}`)
+                .set("Authorization", `Bearer ${adminUserToken}`);
+
+            expect(res.status).toBe(404);
+        });
+
+        it("should return 404 not found if customer belongs to another organization", async () => {
+            const foreignOrg = await Organization.create({ name: "Foreign", code: "FRGN" });
+            const foreignCustomer = await Customer.create({
+                name: "Foreign Customer",
+                email: "foreign@example.com",
+                organizationId: foreignOrg._id
+            });
+
+            const res = await request(app)
+                .get(`/api/customers/${foreignCustomer._id}`)
+                .set("Authorization", `Bearer ${adminUserToken}`);
+
+            expect(res.status).toBe(404);
+        });
+
+        it("should return 403 forbidden if user does not have CUSTOMERS.VIEW permission", async () => {
+            const res = await request(app)
+                .get(`/api/customers/${testCustomer._id}`)
+                .set("Authorization", `Bearer ${userWithoutPermToken}`);
+
+            expect(res.status).toBe(403);
+        });
+    });
+
+    describe("PUT /api/customers/:customerId", () => {
+        let testCustomer;
+
+        beforeEach(async () => {
+            testCustomer = await Customer.create({
+                name: "Alpha Corp",
+                email: "alpha@corp.com",
+                organizationId: orgId
+            });
+        });
+
+        it("should successfully update customer profile details", async () => {
+            const res = await request(app)
+                .put(`/api/customers/${testCustomer._id}`)
+                .set("Authorization", `Bearer ${adminUserToken}`)
+                .send({
+                    name: "Alpha Corp Updated",
+                    email: "alpha.updated@corp.com",
+                    phone: "9999999999",
+                    status: "inactive"
+                });
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.data.name).toBe("Alpha Corp Updated");
+            expect(res.body.data.email).toBe("alpha.updated@corp.com");
+            expect(res.body.data.phone).toBe("9999999999");
+            expect(res.body.data.status).toBe("inactive");
+
+            // Verify in DB
+            const dbCustomer = await Customer.findById(testCustomer._id);
+            expect(dbCustomer.name).toBe("Alpha Corp Updated");
+        });
+
+        it("should return conflict if email already exists in another customer within organization", async () => {
+            // Seed second customer
+            await Customer.create({
+                name: "Second Customer",
+                email: "second@example.com",
+                organizationId: orgId
+            });
+
+            const res = await request(app)
+                .put(`/api/customers/${testCustomer._id}`)
+                .set("Authorization", `Bearer ${adminUserToken}`)
+                .send({
+                    email: "second@example.com" // conflict
+                });
+
+            expect(res.status).toBe(409);
+        });
+
+        it("should return 404 not found if customer belongs to another organization", async () => {
+            const foreignOrg = await Organization.create({ name: "Foreign", code: "FRGN" });
+            const foreignCustomer = await Customer.create({
+                name: "Foreign Customer",
+                email: "foreign@example.com",
+                organizationId: foreignOrg._id
+            });
+
+            const res = await request(app)
+                .put(`/api/customers/${foreignCustomer._id}`)
+                .set("Authorization", `Bearer ${adminUserToken}`)
+                .send({
+                    name: "Hacked Name"
+                });
+
+            expect(res.status).toBe(404);
+        });
+
+        it("should return 403 forbidden if user does not have CUSTOMERS.UPDATE permission", async () => {
+            const res = await request(app)
+                .put(`/api/customers/${testCustomer._id}`)
+                .set("Authorization", `Bearer ${userWithoutPermToken}`)
+                .send({
+                    name: "Not Permitted Name"
+                });
 
             expect(res.status).toBe(403);
         });

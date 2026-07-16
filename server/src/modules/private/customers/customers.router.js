@@ -1,7 +1,7 @@
 // Importing modules
 import express from "express";
 import CustomersController from "./customers.controller.js";
-import { createCustomerValidators, listCustomersValidators } from "./customers.validator.js";
+import { createCustomerValidators, listCustomersValidators, getCustomerValidators, updateCustomerValidators } from "./customers.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
@@ -21,5 +21,19 @@ router.post("/", authMiddleware, permissionMiddleware("customers.create"), creat
     @access Private (requires customers.view permission)
 */
 router.get("/", authMiddleware, permissionMiddleware("customers.view"), listCustomersValidators, controller.listCustomers);
+
+/*
+    @route GET /api/customers/:customerId
+    @desc Get customer details by ID
+    @access Private (requires customers.view permission)
+*/
+router.get("/:customerId", authMiddleware, permissionMiddleware("customers.view"), getCustomerValidators, controller.getCustomerDetails);
+
+/*
+    @route PUT /api/customers/:customerId
+    @desc Update customer profile details
+    @access Private (requires customers.update permission)
+*/
+router.put("/:customerId", authMiddleware, permissionMiddleware("customers.update"), updateCustomerValidators, controller.updateCustomer);
 
 export default router;

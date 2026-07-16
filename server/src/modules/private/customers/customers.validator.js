@@ -1,6 +1,7 @@
 // Importing modules
-import { body, query } from "express-validator";
+import { body, query, param } from "express-validator";
 import validateErrors from "../../../shared/utils/validateErrors.util.js";
+import mongoose from "mongoose";
 
 const createCustomerValidators = [
     // validating name field
@@ -76,4 +77,61 @@ const listCustomersValidators = [
     validateErrors
 ];
 
-export { createCustomerValidators, listCustomersValidators };
+const getCustomerValidators = [
+    // validating customerId param
+    param("customerId")
+        .notEmpty()
+        .withMessage("Customer ID is required")
+        .custom((value) => mongoose.Types.ObjectId.isValid(value))
+        .withMessage("Invalid Customer ID"),
+
+    // validating errors
+    validateErrors
+];
+
+const updateCustomerValidators = [
+    // validating customerId param
+    param("customerId")
+        .notEmpty()
+        .withMessage("Customer ID is required")
+        .custom((value) => mongoose.Types.ObjectId.isValid(value))
+        .withMessage("Invalid Customer ID"),
+
+    // validating name field
+    body("name")
+        .optional()
+        .isLength({ min: 2 })
+        .withMessage("Customer name must be at least 2 characters long"),
+
+    // validating email field
+    body("email")
+        .optional()
+        .isEmail()
+        .withMessage("Email is invalid"),
+
+    // validating phone field
+    body("phone")
+        .optional()
+        .isString(),
+
+    // validating address field
+    body("address")
+        .optional()
+        .isString(),
+
+    // validating taxNumber field
+    body("taxNumber")
+        .optional()
+        .isString(),
+
+    // validating status field
+    body("status")
+        .optional()
+        .isIn(["active", "inactive"])
+        .withMessage("Status must be either active or inactive"),
+
+    // validating errors
+    validateErrors
+];
+
+export { createCustomerValidators, listCustomersValidators, getCustomerValidators, updateCustomerValidators };
