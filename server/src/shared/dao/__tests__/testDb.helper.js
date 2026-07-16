@@ -25,3 +25,13 @@ export async function clearTestDB() {
         await collections[key].deleteMany({});
     }
 }
+
+// Dummy test to satisfy Jest
+describe("Test Database Helper", () => {
+    it("should export helper functions", () => {
+        expect(connectTestDB).toBeDefined();
+        expect(disconnectTestDB).toBeDefined();
+        expect(clearTestDB).toBeDefined();
+    });
+});
+
