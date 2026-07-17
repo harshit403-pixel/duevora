@@ -10,6 +10,7 @@ import customersRouter from "../../modules/private/customers/customers.router.js
 import vendorsRouter from "../../modules/private/vendors/vendors.router.js";
 import categoriesRouter from "../../modules/private/categories/categories.router.js";
 import unitsRouter from "../../modules/private/units/units.router.js";
+import productsRouter from "../../modules/private/products/products.router.js";
 
 // making the router
 const router = express.Router();
@@ -25,6 +26,7 @@ router.use("/customers", customersRouter);
 router.use("/vendors", vendorsRouter);
 router.use("/categories", categoriesRouter);
 router.use("/units", unitsRouter);
+router.use("/products", productsRouter);
 
 // exporting the router
 export default router;
