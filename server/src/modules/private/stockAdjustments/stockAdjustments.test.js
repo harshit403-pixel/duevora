@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { MongoMemoryReplSet } from "mongodb-memory-server";
 import request from "supertest";
 
 // Mock sending mail
@@ -16,6 +16,9 @@ const { default: Employee } = await import("../../../shared/models/employee.mode
 const { default: Permission } = await import("../../../shared/models/permission.model.js");
 const { default: Product } = await import("../../../shared/models/product.model.js");
 const { default: Warehouse } = await import("../../../shared/models/warehouse.model.js");
+const { default: Inventory } = await import("../../../shared/models/inventory.model.js");
+const { default: StockMovement } = await import("../../../shared/models/stockMovement.model.js");
+const { default: StockAdjustment } = await import("../../../shared/models/stockAdjustment.model.js");
 
 let mongoServer;
 let app;
@@ -25,7 +28,12 @@ let userWithoutPermToken;
 let adminEmployee;
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    // MongoMemoryReplSet replica set is required for transactions to work
+    mongoServer = await MongoMemoryReplSet.create({
+        replSet: {
+            storageEngine: "wiredTiger"
+        }
+    });
     const uri = mongoServer.getUri();
     await mongoose.connect(uri);
     app = createApp();
@@ -42,10 +50,16 @@ beforeEach(async () => {
         await collections[key].deleteMany({});
     }
 
-    // Seed permission
+    // Seed permissions
     await Permission.create({
         name: "Create Stock Adjustments",
         code: "STOCKADJUSTMENTS.CREATE",
+        module: "stockAdjustments"
+    });
+
+    await Permission.create({
+        name: "Update Stock Adjustments",
+        code: "STOCKADJUSTMENTS.UPDATE",
         module: "stockAdjustments"
     });
 
@@ -105,15 +119,14 @@ beforeEach(async () => {
 });
 
 describe("Stock Adjustments Management Integration Tests", () => {
+    let product, warehouse;
+
+    beforeEach(async () => {
+        product = await Product.create({ name: "Widget A", sku: "WDG-A", organizationId: orgId });
+        warehouse = await Warehouse.create({ name: "Central", code: "CWH", organizationId: orgId });
+    });
 
     describe("POST /api/stock-adjustments", () => {
-        let product, warehouse;
-
-        beforeEach(async () => {
-            product = await Product.create({ name: "Widget A", sku: "WDG-A", organizationId: orgId });
-            warehouse = await Warehouse.create({ name: "Central", code: "CWH", organizationId: orgId });
-        });
-
         it("should successfully create a stock adjustment draft", async () => {
             const res = await request(app)
                 .post("/api/stock-adjustments")
@@ -177,6 +190,75 @@ describe("Stock Adjustments Management Integration Tests", () => {
                     warehouseId: warehouse._id,
                     adjustedQuantity: -5
                 });
+
+            expect(res.status).toBe(403);
+        });
+    });
+
+    describe("POST /api/stock-adjustments/:adjustmentId/approve", () => {
+        let adjustment;
+
+        beforeEach(async () => {
+            adjustment = await StockAdjustment.create({
+                organizationId: orgId,
+                warehouseId: warehouse._id,
+                productId: product._id,
+                adjustedQuantity: 10,
+                reason: "Initial Count",
+                adjustedById: adminEmployee._id,
+                status: "Draft"
+            });
+        });
+
+        it("should successfully approve a draft stock adjustment", async () => {
+            const res = await request(app)
+                .post(`/api/stock-adjustments/${adjustment._id}/approve`)
+                .set("Authorization", `Bearer ${adminUserToken}`);
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.data.status).toBe("Completed");
+
+            // Verify inventory level was updated
+            const dbInventory = await Inventory.findOne({
+                organizationId: orgId,
+                productId: product._id,
+                warehouseId: warehouse._id
+            });
+            expect(dbInventory).toBeDefined();
+            expect(dbInventory.quantity).toBe(10);
+
+            // Verify stock movement log entry
+            const dbMovement = await StockMovement.findOne({
+                organizationId: orgId,
+                productId: product._id,
+                warehouseId: warehouse._id,
+                referenceId: adjustment._id
+            });
+            expect(dbMovement).toBeDefined();
+            expect(dbMovement.quantity).toBe(10);
+            expect(dbMovement.type).toBe("in");
+            expect(dbMovement.referenceType).toBe("StockAdjustment");
+        });
+
+        it("should return bad request if trying to approve a completed adjustment", async () => {
+            // Approve once
+            await request(app)
+                .post(`/api/stock-adjustments/${adjustment._id}/approve`)
+                .set("Authorization", `Bearer ${adminUserToken}`);
+
+            // Approve again
+            const res = await request(app)
+                .post(`/api/stock-adjustments/${adjustment._id}/approve`)
+                .set("Authorization", `Bearer ${adminUserToken}`);
+
+            expect(res.status).toBe(400);
+        });
+
+        it("should return forbidden if user does not have STOCKADJUSTMENTS.UPDATE permission", async () => {
+            const res = await request(app)
+                .post(`/api/stock-adjustments/${adjustment._id}/approve`)
+                .set("Authorization", `Bearer ${userWithoutPermToken}`);
 
             expect(res.status).toBe(403);
         });
