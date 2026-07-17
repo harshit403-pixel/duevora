@@ -20,6 +20,7 @@ import stockAdjustmentsRouter from "../../modules/private/stockAdjustments/stock
 import stockTransfersRouter from "../../modules/private/stockTransfers/stockTransfers.router.js";
 import taxesRouter from "../../modules/private/taxes/taxes.router.js";
 import quotationsRouter from "../../modules/private/quotations/quotations.router.js";
+import salesOrdersRouter from "../../modules/private/salesOrders/salesOrders.router.js";
 
 // making the router
 const router = express.Router();
@@ -45,6 +46,7 @@ router.use("/stock-adjustments", stockAdjustmentsRouter);
 router.use("/stock-transfers", stockTransfersRouter);
 router.use("/taxes", taxesRouter);
 router.use("/quotations", quotationsRouter);
+router.use("/sales-orders", salesOrdersRouter);
 
 // exporting the router
 export default router;
