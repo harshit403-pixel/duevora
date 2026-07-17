@@ -21,6 +21,7 @@ import stockTransfersRouter from "../../modules/private/stockTransfers/stockTran
 import taxesRouter from "../../modules/private/taxes/taxes.router.js";
 import quotationsRouter from "../../modules/private/quotations/quotations.router.js";
 import salesOrdersRouter from "../../modules/private/salesOrders/salesOrders.router.js";
+import deliveryChallansRouter from "../../modules/private/deliveryChallans/deliveryChallans.router.js";
 
 // making the router
 const router = express.Router();
@@ -47,6 +48,7 @@ router.use("/stock-transfers", stockTransfersRouter);
 router.use("/taxes", taxesRouter);
 router.use("/quotations", quotationsRouter);
 router.use("/sales-orders", salesOrdersRouter);
+router.use("/delivery-challans", deliveryChallansRouter);
 
 // exporting the router
 export default router;
