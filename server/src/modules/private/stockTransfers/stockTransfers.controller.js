@@ -3,9 +3,12 @@ import mongoose from "mongoose";
 import StockTransferDao from "../../../shared/dao/stockTransfer.dao.js";
 import InventoryDao from "../../../shared/dao/inventory.dao.js";
 import StockMovementDao from "../../../shared/dao/stockMovement.dao.js";
+import WarehouseDao from "../../../shared/dao/warehouse.dao.js";
+import ProductDao from "../../../shared/dao/product.dao.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
 import Ok from "../../../shared/responses/Ok.response.js";
+import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle stock transfer operations
 class StockTransfersController {
@@ -16,6 +19,35 @@ class StockTransfersController {
         this.stockTransferDao = new StockTransferDao();
         this.inventoryDao = new InventoryDao();
         this.stockMovementDao = new StockMovementDao();
+        this.warehouseDao = new WarehouseDao();
+        this.productDao = new ProductDao();
+
+    }
+
+    // create a new stock transfer
+    createStockTransfer = async (req, res) => {
+
+        const { fromWarehouseId, toWarehouseId, productId, quantity, transferDate } = req.body;
+        const organizationId = req.user.organizationId;
+
+        if (fromWarehouseId === toWarehouseId) throw new BadRequest("Source and destination warehouses must be different.");
+
+        const fromWh = await this.warehouseDao.findOne({ _id: fromWarehouseId, organizationId });
+        if (!fromWh) throw new NotFound("Source warehouse not found in your organization.");
+
+        const toWh = await this.warehouseDao.findOne({ _id: toWarehouseId, organizationId });
+        if (!toWh) throw new NotFound("Destination warehouse not found in your organization.");
+
+        const product = await this.productDao.findOne({ _id: productId, organizationId });
+        if (!product) throw new NotFound("Product not found in your organization.");
+
+        const transfer = await this.stockTransferDao.create({
+            organizationId, fromWarehouseId, toWarehouseId, productId,
+            quantity, transferDate: transferDate ? new Date(transferDate) : new Date(),
+            status: "pending"
+        });
+
+        return Created(res, "Stock transfer created successfully", transfer);
 
     }
 
