@@ -23,6 +23,7 @@ import quotationsRouter from "../../modules/private/quotations/quotations.router
 import salesOrdersRouter from "../../modules/private/salesOrders/salesOrders.router.js";
 import deliveryChallansRouter from "../../modules/private/deliveryChallans/deliveryChallans.router.js";
 import invoicesRouter from "../../modules/private/invoices/invoices.router.js";
+import purchaseOrdersRouter from "../../modules/private/purchaseOrders/purchaseOrders.router.js";
 
 // making the router
 const router = express.Router();
@@ -51,6 +52,7 @@ router.use("/quotations", quotationsRouter);
 router.use("/sales-orders", salesOrdersRouter);
 router.use("/delivery-challans", deliveryChallansRouter);
 router.use("/invoices", invoicesRouter);
+router.use("/purchase-orders", purchaseOrdersRouter);
 
 // exporting the router
 export default router;
