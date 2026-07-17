@@ -24,6 +24,7 @@ import salesOrdersRouter from "../../modules/private/salesOrders/salesOrders.rou
 import deliveryChallansRouter from "../../modules/private/deliveryChallans/deliveryChallans.router.js";
 import invoicesRouter from "../../modules/private/invoices/invoices.router.js";
 import purchaseOrdersRouter from "../../modules/private/purchaseOrders/purchaseOrders.router.js";
+import purchasesRouter from "../../modules/private/purchases/purchases.router.js";
 
 // making the router
 const router = express.Router();
@@ -53,6 +54,7 @@ router.use("/sales-orders", salesOrdersRouter);
 router.use("/delivery-challans", deliveryChallansRouter);
 router.use("/invoices", invoicesRouter);
 router.use("/purchase-orders", purchaseOrdersRouter);
+router.use("/purchases", purchasesRouter);
 
 // exporting the router
 export default router;
