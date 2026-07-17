@@ -1,9 +1,11 @@
 // Importing modules
 import SalesOrderDao from "../../../shared/dao/salesOrder.dao.js";
 import CustomerDao from "../../../shared/dao/customer.dao.js";
+
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
 import Conflict from "../../../shared/errors/Conflict.error.js";
+
 import Ok from "../../../shared/responses/Ok.response.js";
 import Created from "../../../shared/responses/Created.response.js";
 
@@ -14,6 +16,8 @@ class SalesOrdersController {
 
         // initializing the sales order dao
         this.salesOrderDao = new SalesOrderDao();
+
+        // initializing the customer dao
         this.customerDao = new CustomerDao();
 
     }
@@ -24,22 +28,38 @@ class SalesOrdersController {
         const { customerId, orderNumber, orderDate, grandTotal, status } = req.body;
         const organizationId = req.user.organizationId;
 
+        // validating customer exists in organization
         const customer = await this.customerDao.findOne({ _id: customerId, organizationId });
-        if (!customer) throw new NotFound("Customer not found in your organization.");
 
+        if (!customer) {
+
+            throw new NotFound("Customer not found in your organization.");
+
+        }
+
+        // verifying order number is unique within organization context
         const existing = await this.salesOrderDao.findOne({
             organizationId,
             orderNumber: { $regex: new RegExp(`^${orderNumber.trim()}$`, "i") }
         });
-        if (existing) throw new Conflict("Sales order number already exists in your organization.");
 
+        if (existing) {
+
+            throw new Conflict("Sales order number already exists in your organization.");
+
+        }
+
+        // creating sales order record using sales order dao
         const order = await this.salesOrderDao.create({
-            organizationId, customerId,
+            organizationId,
+            customerId,
             orderNumber: orderNumber.trim(),
             orderDate: new Date(orderDate),
-            grandTotal, status: status || "draft"
+            grandTotal,
+            status: status || "draft"
         });
 
+        // returning the created sales order
         return Created(res, "Sales order created successfully", order);
 
     }
@@ -73,6 +93,7 @@ class SalesOrdersController {
             status: "processing"
         });
 
+        // returning the approved sales order
         return Ok(res, "Sales order approved successfully", updatedOrder);
 
     }

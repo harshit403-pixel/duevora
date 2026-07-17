@@ -5,7 +5,10 @@ import { createCustomerValidators, listCustomersValidators, getCustomerValidator
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a Customers controller instance
 const controller = new CustomersController();
 
 /*
@@ -57,4 +60,5 @@ router.put("/:customerId", authMiddleware, permissionMiddleware("customers.updat
 */
 router.delete("/:customerId", authMiddleware, permissionMiddleware("customers.delete"), getCustomerValidators, controller.deleteCustomer);
 
+// exporting the router
 export default router;

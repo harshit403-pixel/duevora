@@ -4,7 +4,7 @@ import validateErrors from "../../../shared/utils/validateErrors.util.js";
 
 const verifyOtpValidators = [
 
-    // validating otp field
+    // validating the otp field
     body("otp")
         .notEmpty()
         .withMessage("OTP is required"),

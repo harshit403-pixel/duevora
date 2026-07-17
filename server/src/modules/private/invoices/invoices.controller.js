@@ -1,5 +1,7 @@
 // Importing modules
+
 import mongoose from "mongoose";
+
 import InvoiceDao from "../../../shared/dao/invoice.dao.js";
 import InvoiceItemDao from "../../../shared/dao/invoiceItem.dao.js";
 import CustomerDao from "../../../shared/dao/customer.dao.js";
@@ -12,9 +14,11 @@ import AccountDao from "../../../shared/dao/account.dao.js";
 import JournalEntryDao from "../../../shared/dao/journalEntry.dao.js";
 import JournalEntryLineDao from "../../../shared/dao/journalEntryLine.dao.js";
 import LedgerEntryDao from "../../../shared/dao/ledgerEntry.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -23,18 +27,40 @@ class InvoicesController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the invoice dao
         this.invoiceDao = new InvoiceDao();
+
+        // initializing the invoice item dao
         this.invoiceItemDao = new InvoiceItemDao();
+
+        // initializing the customer dao
         this.customerDao = new CustomerDao();
+
+        // initializing the product dao
         this.productDao = new ProductDao();
+
+        // initializing the tax dao
         this.taxDao = new TaxDao();
+
+        // initializing the warehouse dao
         this.warehouseDao = new WarehouseDao();
+
+        // initializing the inventory dao
         this.inventoryDao = new InventoryDao();
+
+        // initializing the stock movement dao
         this.stockMovementDao = new StockMovementDao();
+
+        // initializing the account dao
         this.accountDao = new AccountDao();
+
+        // initializing the journal entry dao
         this.journalEntryDao = new JournalEntryDao();
+
+        // initializing the journal entry line dao
         this.journalEntryLineDao = new JournalEntryLineDao();
+
+        // initializing the ledger entry dao
         this.ledgerEntryDao = new LedgerEntryDao();
 
     }
@@ -179,6 +205,7 @@ class InvoicesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the created invoice
             return Created(res, "Invoice created successfully", invoice);
 
         } catch (error) {
@@ -220,6 +247,7 @@ class InvoicesController {
 
             }
 
+            // checking invoice is in draft state
             if (invoice.status !== "draft") {
 
                 throw new BadRequest("Only draft invoices can be approved.");
@@ -379,6 +407,7 @@ class InvoicesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the approved invoice
             return Ok(res, "Invoice approved successfully", invoice);
 
         } catch (error) {

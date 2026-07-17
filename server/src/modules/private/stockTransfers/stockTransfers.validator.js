@@ -4,16 +4,49 @@ import validateErrors from "../../../shared/utils/validateErrors.util.js";
 import mongoose from "mongoose";
 
 const createStockTransferValidators = [
-    body("fromWarehouseId").notEmpty().withMessage("Source warehouse is required").custom((v) => mongoose.Types.ObjectId.isValid(v)).withMessage("Invalid Source Warehouse ID"),
-    body("toWarehouseId").notEmpty().withMessage("Destination warehouse is required").custom((v) => mongoose.Types.ObjectId.isValid(v)).withMessage("Invalid Destination Warehouse ID"),
-    body("productId").notEmpty().withMessage("Product is required").custom((v) => mongoose.Types.ObjectId.isValid(v)).withMessage("Invalid Product ID"),
-    body("quantity").notEmpty().withMessage("Quantity is required").isInt({ min: 1 }).withMessage("Quantity must be at least 1"),
-    body("transferDate").optional().isISO8601().withMessage("Must be a valid date"),
+
+    // validating the fromWarehouseId field
+    body("fromWarehouseId")
+        .notEmpty()
+        .withMessage("Source warehouse is required")
+        .custom((v) => mongoose.Types.ObjectId.isValid(v))
+        .withMessage("Invalid Source Warehouse ID"),
+
+    // validating the toWarehouseId field
+    body("toWarehouseId")
+        .notEmpty()
+        .withMessage("Destination warehouse is required")
+        .custom((v) => mongoose.Types.ObjectId.isValid(v))
+        .withMessage("Invalid Destination Warehouse ID"),
+
+    // validating the productId field
+    body("productId")
+        .notEmpty()
+        .withMessage("Product is required")
+        .custom((v) => mongoose.Types.ObjectId.isValid(v))
+        .withMessage("Invalid Product ID"),
+
+    // validating the quantity field
+    body("quantity")
+        .notEmpty()
+        .withMessage("Quantity is required")
+        .isInt({ min: 1 })
+        .withMessage("Quantity must be at least 1"),
+
+    // validating the transferDate field
+    body("transferDate")
+        .optional()
+        .isISO8601()
+        .withMessage("Must be a valid date"),
+
+    // validating errors
     validateErrors
+
 ];
 
 const approveStockTransferValidators = [
-    // validating transferId param
+
+    // validating the transferId param
     param("transferId")
         .notEmpty()
         .withMessage("Transfer ID is required")
@@ -22,6 +55,7 @@ const approveStockTransferValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 export { createStockTransferValidators, approveStockTransferValidators };

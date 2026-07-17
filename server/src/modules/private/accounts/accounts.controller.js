@@ -1,6 +1,8 @@
 // Importing modules
 import AccountDao from "../../../shared/dao/account.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle account operations
@@ -43,6 +45,7 @@ class AccountsController {
             status: status || "active"
         });
 
+        // returning the created account
         return Created(res, "Account created successfully", account);
 
     }

@@ -1,9 +1,11 @@
 // Importing modules
 import mongoose from "mongoose";
 import VendorDao from "../../../shared/dao/vendor.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -54,6 +56,7 @@ class VendorsController {
             isDeleted: false
         });
 
+        // returning the created vendor
         return Created(res, "Vendor profile created successfully", vendor);
 
     }
@@ -106,6 +109,7 @@ class VendorsController {
         // constructing pagination metadata
         const pages = Math.ceil(total / limit);
 
+        // returning the paginated vendors list
         return res.status(200).json({
             success: true,
             status: 200,
@@ -142,6 +146,7 @@ class VendorsController {
 
         }
 
+        // returning the vendor details
         return Ok(res, "Vendor details retrieved successfully", vendor);
 
     }
@@ -200,6 +205,7 @@ class VendorsController {
             status: status !== undefined ? status : vendor.status
         });
 
+        // returning the updated vendor
         return Ok(res, "Vendor profile updated successfully", updatedVendor);
 
     }
@@ -230,6 +236,7 @@ class VendorsController {
             isDeleted: true
         });
 
+        // returning success response
         return Ok(res, "Vendor profile deleted successfully");
 
     }
@@ -309,6 +316,7 @@ class VendorsController {
             // committing transaction and saving all documents
             await session.commitTransaction();
 
+            // returning the imported vendors
             return Created(res, "Vendors imported successfully", importedVendors);
 
         } catch (error) {
@@ -370,6 +378,7 @@ class VendorsController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the bulk updated vendors
             return Ok(res, "Vendors updated successfully", updatedVendors);
 
         } catch (error) {

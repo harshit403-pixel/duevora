@@ -12,9 +12,11 @@ import AccountDao from "../../../shared/dao/account.dao.js";
 import JournalEntryDao from "../../../shared/dao/journalEntry.dao.js";
 import JournalEntryLineDao from "../../../shared/dao/journalEntryLine.dao.js";
 import LedgerEntryDao from "../../../shared/dao/ledgerEntry.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -23,18 +25,40 @@ class PurchasesController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the purchase dao
         this.purchaseDao = new PurchaseDao();
+
+        // initializing the purchase item dao
         this.purchaseItemDao = new PurchaseItemDao();
+
+        // initializing the vendor dao
         this.vendorDao = new VendorDao();
+
+        // initializing the product dao
         this.productDao = new ProductDao();
+
+        // initializing the tax dao
         this.taxDao = new TaxDao();
+
+        // initializing the warehouse dao
         this.warehouseDao = new WarehouseDao();
+
+        // initializing the inventory dao
         this.inventoryDao = new InventoryDao();
+
+        // initializing the stock movement dao
         this.stockMovementDao = new StockMovementDao();
+
+        // initializing the account dao
         this.accountDao = new AccountDao();
+
+        // initializing the journal entry dao
         this.journalEntryDao = new JournalEntryDao();
+
+        // initializing the journal entry line dao
         this.journalEntryLineDao = new JournalEntryLineDao();
+
+        // initializing the ledger entry dao
         this.ledgerEntryDao = new LedgerEntryDao();
 
     }
@@ -172,6 +196,7 @@ class PurchasesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the created purchase
             return Created(res, "Purchase recorded successfully", purchase);
 
         } catch (error) {
@@ -372,6 +397,7 @@ class PurchasesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the approved purchase
             return Ok(res, "Purchase approved successfully", purchase);
 
         } catch (error) {
@@ -392,6 +418,7 @@ class PurchasesController {
     // helper to get or create account
     getOrCreateAccount = async (organizationId, name, code, type, session) => {
 
+        // looking up existing account by organization and code
         let account = await this.accountDao.Model.findOne({
             organizationId,
             code
@@ -399,6 +426,7 @@ class PurchasesController {
 
         if (!account) {
 
+            // creating a new account if not found
             account = new this.accountDao.Model({
                 organizationId,
                 name,

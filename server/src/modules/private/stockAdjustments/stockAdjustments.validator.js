@@ -4,33 +4,34 @@ import validateErrors from "../../../shared/utils/validateErrors.util.js";
 import mongoose from "mongoose";
 
 const createStockAdjustmentValidators = [
-    // validating warehouseId field
+
+    // validating the warehouseId field
     body("warehouseId")
         .notEmpty()
         .withMessage("Warehouse ID is required")
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Warehouse ID"),
 
-    // validating productId field
+    // validating the productId field
     body("productId")
         .notEmpty()
         .withMessage("Product ID is required")
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Product ID"),
 
-    // validating adjustedQuantity field
+    // validating the adjustedQuantity field
     body("adjustedQuantity")
         .notEmpty()
         .withMessage("Adjusted quantity is required")
         .isFloat()
         .withMessage("Adjusted quantity must be a number"),
 
-    // validating reason field
+    // validating the reason field
     body("reason")
         .optional()
         .isString(),
 
-    // validating date field
+    // validating the date field
     body("date")
         .optional()
         .isISO8601()
@@ -38,10 +39,12 @@ const createStockAdjustmentValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 const approveStockAdjustmentValidators = [
-    // validating adjustmentId param
+
+    // validating the adjustmentId param
     param("adjustmentId")
         .notEmpty()
         .withMessage("Adjustment ID is required")
@@ -50,6 +53,7 @@ const approveStockAdjustmentValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 export {

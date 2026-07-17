@@ -1,6 +1,8 @@
 // Importing modules
 import UnitDao from "../../../shared/dao/unit.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle unit operations
@@ -38,6 +40,7 @@ class UnitsController {
             code: code.toUpperCase()
         });
 
+        // returning the created unit
         return Created(res, "Unit created successfully", unit);
 
     }

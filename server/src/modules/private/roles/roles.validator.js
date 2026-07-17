@@ -4,14 +4,15 @@ import validateErrors from "../../../shared/utils/validateErrors.util.js";
 import mongoose from "mongoose";
 
 const createRoleValidators = [
-    // validating name field
+
+    // validating the name field
     body("name")
         .notEmpty()
         .withMessage("Role name is required")
         .isLength({ min: 2 })
         .withMessage("Role name must be at least 2 characters long"),
 
-    // validating code field
+    // validating the code field
     body("code")
         .notEmpty()
         .withMessage("Role code is required")
@@ -20,24 +21,26 @@ const createRoleValidators = [
         .matches(/^[a-zA-Z0-9_]+$/)
         .withMessage("Role code must be alphanumeric and can contain underscores"),
 
-    // validating description field
+    // validating the description field
     body("description")
         .optional()
         .isString(),
 
     // validating errors
     validateErrors
+
 ];
 
 const bindPermissionsValidators = [
-    // validating roleId param
+
+    // validating the roleId param
     param("roleId")
         .notEmpty()
         .withMessage("Role ID is required")
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Role ID"),
 
-    // validating permissionIds body array
+    // validating the permissionIds field
     body("permissionIds")
         .isArray({ min: 1 })
         .withMessage("Permission IDs must be a non-empty array"),
@@ -49,6 +52,7 @@ const bindPermissionsValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 export { createRoleValidators, bindPermissionsValidators };

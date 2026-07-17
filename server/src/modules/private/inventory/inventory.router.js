@@ -5,7 +5,10 @@ import { listInventoryValidators } from "./inventory.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a inventory controller instance
 const controller = new InventoryController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new InventoryController();
 */
 router.get("/", authMiddleware, permissionMiddleware("inventory.view"), listInventoryValidators, controller.listInventory);
 
+// exporting the router
 export default router;

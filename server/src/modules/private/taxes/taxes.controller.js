@@ -1,6 +1,8 @@
 // Importing modules
 import TaxDao from "../../../shared/dao/tax.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle tax operations
@@ -39,6 +41,7 @@ class TaxesController {
             code: code.toUpperCase()
         });
 
+        // returning the created tax
         return Created(res, "Tax created successfully", tax);
 
     }

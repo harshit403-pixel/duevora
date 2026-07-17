@@ -5,7 +5,10 @@ import { createRoleValidators, bindPermissionsValidators } from "./roles.validat
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a RolesController instance
 const controller = new RolesController();
 
 /*
@@ -22,4 +25,5 @@ router.post("/", authMiddleware, permissionMiddleware("roles.create"), createRol
 */
 router.post("/:roleId/permissions", authMiddleware, permissionMiddleware("roles.update"), bindPermissionsValidators, controller.bindPermissions);
 
+// exporting the router
 export default router;

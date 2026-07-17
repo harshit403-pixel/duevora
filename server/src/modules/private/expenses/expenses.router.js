@@ -5,7 +5,10 @@ import { createExpenseValidators } from "./expenses.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a expenses controller instance
 const controller = new ExpensesController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new ExpensesController();
 */
 router.post("/", authMiddleware, permissionMiddleware("expenses.create"), createExpenseValidators, controller.createExpense);
 
+// exporting the router
 export default router;

@@ -3,14 +3,15 @@ import { body } from "express-validator";
 import validateErrors from "../../../shared/utils/validateErrors.util.js";
 
 const createVoucherTypeValidators = [
-    // validating name field
+
+    // validating the name field
     body("name")
         .notEmpty()
         .withMessage("Voucher type name is required")
         .isString()
         .trim(),
 
-    // validating code field
+    // validating the code field
     body("code")
         .notEmpty()
         .withMessage("Voucher type code is required")
@@ -18,13 +19,14 @@ const createVoucherTypeValidators = [
         .withMessage("Voucher type code must be alphanumeric")
         .trim(),
 
-    // validating description field
+    // validating the description field
     body("description")
         .optional()
         .isString(),
 
     // validating errors
     validateErrors
+
 ];
 
 export { createVoucherTypeValidators };

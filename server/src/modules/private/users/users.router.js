@@ -5,7 +5,10 @@ import { listUsersValidators, updateUserValidators, deleteUserValidators } from 
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a users controller instance
 const controller = new UsersController();
 
 /*
@@ -29,4 +32,5 @@ router.put("/:userId", authMiddleware, permissionMiddleware("users.update"), upd
 */
 router.delete("/:userId", authMiddleware, permissionMiddleware("users.delete"), deleteUserValidators, controller.deleteUser);
 
+// exporting the router
 export default router;

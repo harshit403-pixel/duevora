@@ -5,7 +5,10 @@ import { createVoucherTypeValidators } from "./voucherTypes.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a VoucherTypesController instance
 const controller = new VoucherTypesController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new VoucherTypesController();
 */
 router.post("/", authMiddleware, permissionMiddleware("voucherTypes.create"), createVoucherTypeValidators, controller.createVoucherType);
 
+// exporting the router
 export default router;

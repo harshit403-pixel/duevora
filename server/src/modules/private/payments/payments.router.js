@@ -5,7 +5,10 @@ import { createPaymentValidators } from "./payments.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a PaymentsController instance
 const controller = new PaymentsController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new PaymentsController();
 */
 router.post("/", authMiddleware, permissionMiddleware("payments.create"), createPaymentValidators, controller.createPayment);
 
+// exporting the router
 export default router;

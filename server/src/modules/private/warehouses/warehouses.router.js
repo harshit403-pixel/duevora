@@ -5,7 +5,10 @@ import { createWarehouseValidators } from "./warehouses.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a WarehousesController instance
 const controller = new WarehousesController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new WarehousesController();
 */
 router.post("/", authMiddleware, permissionMiddleware("warehouses.create"), createWarehouseValidators, controller.createWarehouse);
 
+// exporting the router
 export default router;

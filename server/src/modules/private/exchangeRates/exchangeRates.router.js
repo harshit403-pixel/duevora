@@ -5,7 +5,10 @@ import { createExchangeRateValidators } from "./exchangeRates.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a exchange rates controller instance
 const controller = new ExchangeRatesController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new ExchangeRatesController();
 */
 router.post("/", authMiddleware, permissionMiddleware("exchangeRates.create"), createExchangeRateValidators, controller.createExchangeRate);
 
+// exporting the router
 export default router;

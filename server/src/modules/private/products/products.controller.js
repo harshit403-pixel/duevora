@@ -1,11 +1,15 @@
 // Importing modules
+
 import mongoose from "mongoose";
+
 import ProductDao from "../../../shared/dao/product.dao.js";
 import CategoryDao from "../../../shared/dao/category.dao.js";
 import UnitDao from "../../../shared/dao/unit.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -14,9 +18,13 @@ class ProductsController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the product dao
         this.productDao = new ProductDao();
+
+        // initializing the category dao
         this.categoryDao = new CategoryDao();
+
+        // initializing the unit dao
         this.unitDao = new UnitDao();
 
     }
@@ -24,6 +32,7 @@ class ProductsController {
     // create a new product
     createProduct = async (req, res) => {
 
+        // extracting required fields from request body
         const { name, sku, description, categoryId, unitId, price, cost, status } = req.body;
         const organizationId = req.user.organizationId;
 
@@ -88,6 +97,7 @@ class ProductsController {
             isDeleted: false
         });
 
+        // returning the created product
         return Created(res, "Product created successfully", product);
 
     }
@@ -95,6 +105,7 @@ class ProductsController {
     // list products with pagination, sorting, and search
     listProducts = async (req, res) => {
 
+        // extracting organization id from authenticated user
         const organizationId = req.user.organizationId;
 
         // formulating product filter based on organization isolation and excluding soft deleted products
@@ -140,6 +151,7 @@ class ProductsController {
         // constructing pagination metadata
         const pages = Math.ceil(total / limit);
 
+        // returning the paginated products list
         return res.status(200).json({
             success: true,
             status: 200,
@@ -158,6 +170,7 @@ class ProductsController {
     // get product details by id
     getProductDetails = async (req, res) => {
 
+        // extracting product id from route params
         const { productId } = req.params;
         const organizationId = req.user.organizationId;
 
@@ -176,6 +189,7 @@ class ProductsController {
 
         }
 
+        // returning the product details
         return Ok(res, "Product details retrieved successfully", product);
 
     }
@@ -183,6 +197,7 @@ class ProductsController {
     // update product details
     updateProduct = async (req, res) => {
 
+        // extracting product id and update fields from request
         const { productId } = req.params;
         const { name, sku, description, categoryId, unitId, price, cost, status } = req.body;
         const organizationId = req.user.organizationId;
@@ -268,6 +283,7 @@ class ProductsController {
             status: status !== undefined ? status : product.status
         });
 
+        // returning the updated product
         return Ok(res, "Product updated successfully", updatedProduct);
 
     }
@@ -275,6 +291,7 @@ class ProductsController {
     // soft delete a product
     deleteProduct = async (req, res) => {
 
+        // extracting product id from route params
         const { productId } = req.params;
         const organizationId = req.user.organizationId;
 
@@ -298,6 +315,7 @@ class ProductsController {
             isDeleted: true
         });
 
+        // returning success response
         return Ok(res, "Product deleted successfully");
 
     }
@@ -305,6 +323,7 @@ class ProductsController {
     // bulk import products using database replica transactions
     bulkImportProducts = async (req, res) => {
 
+        // extracting products array and organization id
         const { products } = req.body;
         const organizationId = req.user.organizationId;
 
@@ -401,6 +420,7 @@ class ProductsController {
             // committing transaction and saving all documents
             await session.commitTransaction();
 
+            // returning the imported products
             return Created(res, "Products imported successfully", importedProducts);
 
         } catch (error) {

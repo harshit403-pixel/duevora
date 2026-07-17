@@ -5,12 +5,15 @@ import TokenDao from "../../../shared/dao/token.dao.js";
 import RoleDao from "../../../shared/dao/role.dao.js";
 import EmployeeDao from "../../../shared/dao/employee.dao.js";
 import DepartmentDao from "../../../shared/dao/department.dao.js";
+
 import sendMail from "../../../shared/utils/sendMail.util.js";
-import Created from "../../../shared/responses/Created.response.js";
+
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import Forbidden from "../../../shared/errors/Forbidden.error.js";
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
+import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle employee operations
 class EmployeesController {
@@ -45,7 +48,7 @@ class EmployeesController {
 
         // verifying that the role exists and belongs to the organization using role dao
         const role = await this.roleDao.findOne({ _id: roleId, organizationId });
-        
+
         if (!role) {
 
             throw new NotFound("Role not found in your organization.");
@@ -78,6 +81,7 @@ class EmployeesController {
             `You have been invited to join the ERP Accounting System. Click the link to register (valid for 15 minutes): ${inviteUrl}`
         );
 
+        // returning the invitation details
         return Created(res, "Invitation link generated successfully", {
             token,
             inviteUrl,
@@ -158,6 +162,7 @@ class EmployeesController {
             departmentId: departmentId || null
         });
 
+        // returning the created employee profile
         return Created(res, "Employee profile created successfully", employee);
 
     }
@@ -268,6 +273,7 @@ class EmployeesController {
             // committing transaction and saving all documents
             await session.commitTransaction();
 
+            // returning the imported employees
             return Created(res, "Employees imported successfully", importedEmployees);
 
         } catch (error) {

@@ -3,14 +3,15 @@ import { body } from "express-validator";
 import validateErrors from "../../../shared/utils/validateErrors.util.js";
 
 const createAccountValidators = [
-    // validating name field
+
+    // validating the name field
     body("name")
         .notEmpty()
         .withMessage("Account name is required")
         .isString()
         .trim(),
 
-    // validating code field
+    // validating the code field
     body("code")
         .notEmpty()
         .withMessage("Account code is required")
@@ -18,14 +19,14 @@ const createAccountValidators = [
         .withMessage("Account code must be alphanumeric or contain underscores")
         .trim(),
 
-    // validating type field
+    // validating the type field
     body("type")
         .notEmpty()
         .withMessage("Account type is required")
         .isIn(["asset", "liability", "equity", "revenue", "expense"])
         .withMessage("Invalid account type"),
 
-    // validating status field
+    // validating the status field
     body("status")
         .optional()
         .isIn(["active", "inactive"])
@@ -33,6 +34,7 @@ const createAccountValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 export { createAccountValidators };

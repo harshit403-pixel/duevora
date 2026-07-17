@@ -5,7 +5,10 @@ import { createInvoiceValidators, approveInvoiceValidators } from "./invoices.va
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a invoices controller instance
 const controller = new InvoicesController();
 
 /*
@@ -22,4 +25,5 @@ router.post("/", authMiddleware, permissionMiddleware("invoices.create"), create
 */
 router.post("/:invoiceId/approve", authMiddleware, permissionMiddleware("invoices.update"), approveInvoiceValidators, controller.approveInvoice);
 
+// exporting the router
 export default router;

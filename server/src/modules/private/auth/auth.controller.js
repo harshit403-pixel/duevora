@@ -1,5 +1,4 @@
-// Importing modules 
-
+// Importing modules
 import UserDao from "../../../shared/dao/user.dao.js";
 import SessionDao from "../../../shared/dao/session.dao.js";
 import TokenDao from "../../../shared/dao/token.dao.js";
@@ -32,6 +31,7 @@ class AuthController {
 
     }
 
+    // verify email using otp
     verifyEmail = async (req, res) => {
 
         // getting the otp from the request
@@ -51,31 +51,33 @@ class AuthController {
 
         }
 
-        // Updating the user
+        // updating the user
         const updatedUser = await this.userDao.updateUserById(user._id, { isVerified: true });
 
-        // sanitizing the updated user 
+        // sanitizing the updated user
         const sanitizedUser = sanitizeUser(updatedUser);
 
         // generating the new accesstoken
         const accessToken = generateAccessToken(sanitizedUser);
 
+        // returning the verified user with access token
         return Ok(res, "Email Verified Successfully", { user: sanitizedUser, accessToken: accessToken });
 
     }
 
+    // send otp to user email
     sendOtp = async (req, res) => {
 
-        // taking the user from the request 
+        // taking the user from the request
         const user = req.user;
 
         // deleting the old token if exist
         const oldOtp = await this.tokenDao.deleteTokenByEmail(user.email, "otp");
 
-        // generating the new token 
+        // generating the new token
         const otp = generateOTPToken();
 
-        // setting the otp in the database 
+        // setting the otp in the database
         const otpSet = await this.tokenDao.createToken(
             {
                 email: user.email,
@@ -85,14 +87,15 @@ class AuthController {
             }
         );
 
-        // Sending the otp to the user
+        // sending the otp to the user
         sendMail(user.email, "Verify your email", `Your OTP is ${otp}. It will expire in ${OTP_EXPIRY_TIME / 60000} minutes.`);
 
-        // returning the response 
+        // returning the response
         return Ok(res, "Otp Sent SuccessFully");
 
     }
 
+    // refresh access token using refresh token cookie
     refresh = async (req, res) => {
 
         // getting the refresh token from the request object
@@ -133,11 +136,12 @@ class AuthController {
         // setting the new refresh token in the cookie
         res.cookie("refreshToken", newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-        // sending the response with the new access token
+        // returning the new access token
         return Ok(res, "Access token refreshed successfully", { accessToken: accessToken });
 
     }
 
+    // get current authenticated user details
     me = async (req, res) => {
 
         // getting the refresh token from the request object
@@ -163,11 +167,12 @@ class AuthController {
         // generating a new access token using the user id from the session
         const accessToken = generateAccessToken(sanitizedUser);
 
-        // sending the response with the sanitized user
+        // returning the authenticated user with a fresh access token
         return Ok(res, "User fetched successfully", { user: sanitizedUser, accessToken: accessToken });
 
     }
 
+    // logout user from current session
     logout = async (req, res) => {
 
         // getting the refresh token from the request object
@@ -182,11 +187,12 @@ class AuthController {
         // clearing the refresh token from the cookie
         res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
 
-        // sending the response
+        // returning success response
         return Ok(res, "User logged out successfully");
 
     }
 
+    // logout user from all devices
     logoutAll = async (req, res) => {
 
         // getting the user id from the request object
@@ -198,7 +204,7 @@ class AuthController {
         // clearing the refresh token from the cookie
         res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
 
-        // sending the response
+        // returning success response
         return Ok(res, "User logged out from all devices successfully");
 
     }

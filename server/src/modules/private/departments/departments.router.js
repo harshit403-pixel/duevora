@@ -5,7 +5,10 @@ import { createDepartmentValidators } from "./departments.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a Departments controller instance
 const controller = new DepartmentsController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new DepartmentsController();
 */
 router.post("/", authMiddleware, permissionMiddleware("departments.create"), createDepartmentValidators, controller.createDepartment);
 
+// exporting the router
 export default router;

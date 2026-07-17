@@ -7,9 +7,11 @@ import AccountDao from "../../../shared/dao/account.dao.js";
 import JournalEntryDao from "../../../shared/dao/journalEntry.dao.js";
 import JournalEntryLineDao from "../../../shared/dao/journalEntryLine.dao.js";
 import LedgerEntryDao from "../../../shared/dao/ledgerEntry.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle receipt operations
@@ -17,13 +19,25 @@ class ReceiptsController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the receipt dao
         this.receiptDao = new ReceiptDao();
+
+        // initializing the invoice dao
         this.invoiceDao = new InvoiceDao();
+
+        // initializing the customer dao
         this.customerDao = new CustomerDao();
+
+        // initializing the account dao
         this.accountDao = new AccountDao();
+
+        // initializing the journal entry dao
         this.journalEntryDao = new JournalEntryDao();
+
+        // initializing the journal entry line dao
         this.journalEntryLineDao = new JournalEntryLineDao();
+
+        // initializing the ledger entry dao
         this.ledgerEntryDao = new LedgerEntryDao();
 
     }
@@ -188,6 +202,7 @@ class ReceiptsController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the created receipt
             return Created(res, "Receipt recorded successfully", receipt);
 
         } catch (error) {
@@ -208,6 +223,7 @@ class ReceiptsController {
     // helper to get or create account
     getOrCreateAccount = async (organizationId, name, code, type, session) => {
 
+        // looking up existing account by organization and code
         let account = await this.accountDao.Model.findOne({
             organizationId,
             code
@@ -215,6 +231,7 @@ class ReceiptsController {
 
         if (!account) {
 
+            // creating a new account if not found
             account = new this.accountDao.Model({
                 organizationId,
                 name,

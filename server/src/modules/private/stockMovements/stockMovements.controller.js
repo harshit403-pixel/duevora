@@ -22,18 +22,21 @@ class StockMovementsController {
             organizationId
         };
 
+        // filtering by productId if provided
         if (productId) {
 
             filter.productId = productId;
 
         }
 
+        // filtering by warehouseId if provided
         if (warehouseId) {
 
             filter.warehouseId = warehouseId;
 
         }
 
+        // filtering by movement type if provided
         if (type) {
 
             filter.type = type;
@@ -58,6 +61,7 @@ class StockMovementsController {
         // constructing pagination metadata
         const pages = Math.ceil(total / limit);
 
+        // returning the paginated stock movements list
         return res.status(200).json({
             success: true,
             status: 200,

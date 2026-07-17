@@ -1,7 +1,9 @@
 // Importing modules
 import CategoryDao from "../../../shared/dao/category.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle category operations
@@ -56,6 +58,7 @@ class CategoriesController {
             parentId: parentId || undefined
         });
 
+        // returning the created category
         return Created(res, "Category created successfully", category);
 
     }

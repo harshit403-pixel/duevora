@@ -1,9 +1,12 @@
 // Importing modules
 import mongoose from "mongoose";
+
 import CustomerDao from "../../../shared/dao/customer.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -54,6 +57,7 @@ class CustomersController {
             isDeleted: false
         });
 
+        // returning the created customer profile
         return Created(res, "Customer profile created successfully", customer);
 
     }
@@ -106,6 +110,7 @@ class CustomersController {
         // constructing pagination metadata
         const pages = Math.ceil(total / limit);
 
+        // returning the paginated customers list
         return res.status(200).json({
             success: true,
             status: 200,
@@ -142,6 +147,7 @@ class CustomersController {
 
         }
 
+        // returning the customer details
         return Ok(res, "Customer details retrieved successfully", customer);
 
     }
@@ -200,6 +206,7 @@ class CustomersController {
             status: status !== undefined ? status : customer.status
         });
 
+        // returning the updated customer
         return Ok(res, "Customer profile updated successfully", updatedCustomer);
 
     }
@@ -230,6 +237,7 @@ class CustomersController {
             isDeleted: true
         });
 
+        // returning success response
         return Ok(res, "Customer profile deleted successfully");
 
     }
@@ -309,6 +317,7 @@ class CustomersController {
             // committing transaction and saving all documents
             await session.commitTransaction();
 
+            // returning the imported customers
             return Created(res, "Customers imported successfully", importedCustomers);
 
         } catch (error) {
@@ -365,6 +374,7 @@ class CustomersController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning success response
             return Ok(res, "Customers deleted successfully");
 
         } catch (error) {

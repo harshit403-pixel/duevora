@@ -3,16 +3,15 @@ import sendMail from "../../../shared/utils/sendMail.util.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 import env from "../../../shared/config/env.config.js";
 
+// class to handle contact operations
 class ContactController {
 
-    // @route  POST /api/contact
-    // @desc   Handle contact form submission — sends confirmation to sender + notification to admin
-    // @access Public
+    // handle contact form submission
     contact = async (req, res) => {
 
         const { name, email, phone, subject, message } = req.body;
 
-        // ── 1. Confirmation email to the person who submitted the form ──────────
+        // sending confirmation email to the person who submitted the form
         sendMail(
             email,
             `We received your message — ${subject}`,
@@ -35,7 +34,7 @@ class ContactController {
             `
         );
 
-        // ── 2. Notification email to the admin / support inbox ───────────────────
+        // sending notification email to the admin / support inbox
         sendMail(
             env.SENDING_USER,
             `[Contact Form] ${subject} — from ${name}`,
@@ -54,6 +53,7 @@ class ContactController {
             `
         );
 
+        // returning success response
         return Ok(res, "Your message has been sent successfully. We will get back to you soon.");
 
     };

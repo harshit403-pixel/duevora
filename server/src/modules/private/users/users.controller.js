@@ -1,8 +1,10 @@
 // Importing modules
 import UserDao from "../../../shared/dao/user.dao.js";
 import EmployeeDao from "../../../shared/dao/employee.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
+
 import Ok from "../../../shared/responses/Ok.response.js";
 
 // class to handle users operations
@@ -79,7 +81,8 @@ class UsersController {
 
         // constructing pagination metadata
         const pages = Math.ceil(total / limit);
-        
+
+        // returning the paginated users list
         return res.status(200).json({
             success: true,
             status: 200,
@@ -104,7 +107,7 @@ class UsersController {
 
         // checking organization isolation: verify that the target userId belongs to the organization
         const employee = await this.employeeDao.findOne({ userId, organizationId });
-        
+
         if (!employee) {
 
             throw new NotFound("User not found in your organization.");
@@ -167,6 +170,7 @@ class UsersController {
             isVerified: user.isVerified
         };
 
+        // returning the updated user
         return Ok(res, "User details updated successfully", sanitizedUser);
 
     }
@@ -207,6 +211,7 @@ class UsersController {
         employee.status = "inactive";
         await employee.save();
 
+        // returning success response
         return Ok(res, "User soft deleted successfully");
 
     }

@@ -5,7 +5,10 @@ import { createSalesOrderValidators, approveSalesOrderValidators } from "./sales
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a SalesOrdersController instance
 const controller = new SalesOrdersController();
 
 /*
@@ -22,4 +25,5 @@ router.post("/", authMiddleware, permissionMiddleware("salesOrders.create"), cre
 */
 router.post("/:orderId/approve", authMiddleware, permissionMiddleware("salesOrders.update"), approveSalesOrderValidators, controller.approveSalesOrder);
 
+// exporting the router
 export default router;

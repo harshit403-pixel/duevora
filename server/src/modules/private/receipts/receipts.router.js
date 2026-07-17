@@ -5,7 +5,10 @@ import { createReceiptValidators } from "./receipts.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a ReceiptsController instance
 const controller = new ReceiptsController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new ReceiptsController();
 */
 router.post("/", authMiddleware, permissionMiddleware("receipts.create"), createReceiptValidators, controller.createReceipt);
 
+// exporting the router
 export default router;
