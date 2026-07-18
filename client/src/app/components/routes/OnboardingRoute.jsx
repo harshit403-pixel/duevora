@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router";
 import { useAppSelector } from "../../store/hooks";
 import useAuth from "../../../features/auth/hooks/useAuth";
 
-export default function ProtectedRoute({ requireVerified = false, requireOnboarding = false }) {
+export default function OnboardingRoute() {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const { restoreSession } = useAuth();
   const [checking, setChecking] = useState(true);
@@ -20,12 +20,8 @@ export default function ProtectedRoute({ requireVerified = false, requireOnboard
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
-  if (requireVerified && !user?.isVerified) {
-    return <Navigate to="/verify-email" replace />;
-  }
-
-  if (requireOnboarding && !user?.organizationId) {
-    return <Navigate to="/onboard" replace />;
+  if (user?.organizationId) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Outlet />;

@@ -1,0 +1,133 @@
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 120px;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 5;
+}
+
+.paperArea {
+  position: relative;
+  width: 340px;
+}
+
+.nextArea {
+  position: fixed;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+
+.progressArea {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  z-index: 20;
+}
+
+.receiptWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.sectionWrap {
+  position: relative;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.activeSection {
+  opacity: 1;
+}
+
+.completedSection {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.upcomingSection {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Falling receipt container */
+.fallingContainer {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .nextArea {
+    position: fixed;
+    right: 24px;
+    top: auto;
+    bottom: 100px;
+    transform: none;
+  }
+
+  .progressArea {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding-top: 100px;
+    padding-bottom: 140px;
+  }
+
+  .paperArea {
+    width: 280px;
+  }
+
+  .nextArea {
+    right: 16px;
+    bottom: 160px;
+  }
+
+  .progressArea {
+    bottom: 16px;
+    right: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding-top: 90px;
+  }
+
+  .paperArea {
+    width: 240px;
+  }
+
+  .nextArea {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    bottom: 20px;
+    transform: translateX(-50%);
+  }
+
+  .progressArea {
+    position: fixed;
+    top: 20px;
+    right: 16px;
+    bottom: auto;
+  }
+}

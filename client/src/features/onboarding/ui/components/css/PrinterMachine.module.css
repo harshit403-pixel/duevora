@@ -1,0 +1,197 @@
+.machine {
+  position: relative;
+  width: 380px;
+  margin: 0 auto;
+  z-index: 5;
+}
+
+.machineBody {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(180deg, #e8e4dc 0%, #d9d4ca 100%);
+  border-radius: 16px 16px 8px 8px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.machineTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.machineIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+}
+
+.machineBrand {
+  font-size: 16px;
+  font-weight: 800;
+  color: #3a3632;
+  letter-spacing: 2px;
+}
+
+.machineSlot {
+  width: 85%;
+  height: 6px;
+  background: #2a2725;
+  border-radius: 3px;
+  margin-top: auto;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Rollers on the sides */
+.roller {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #3a3632 0%, #2a2725 100%);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.roller::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #555;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rollerLeft {
+  left: -14px;
+}
+
+.rollerRight {
+  right: -14px;
+}
+
+.rollerKnob {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #555 0%, #333 100%);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.rollerKnobLeft {
+  left: -36px;
+}
+
+.rollerKnobRight {
+  right: -36px;
+}
+
+/* Paper exit area */
+.paperExit {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 8px;
+  z-index: 6;
+}
+
+@media (max-width: 768px) {
+  .machine {
+    width: 300px;
+  }
+
+  .machineBody {
+    height: 110px;
+    border-radius: 12px 12px 6px 6px;
+  }
+
+  .machineBrand {
+    font-size: 13px;
+  }
+
+  .roller {
+    width: 22px;
+    height: 22px;
+  }
+
+  .rollerKnob {
+    width: 16px;
+    height: 16px;
+  }
+
+  .rollerLeft {
+    left: -11px;
+  }
+
+  .rollerRight {
+    right: -11px;
+  }
+
+  .rollerKnobLeft {
+    left: -28px;
+  }
+
+  .rollerKnobRight {
+    right: -28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .machine {
+    width: 240px;
+  }
+
+  .machineBody {
+    height: 90px;
+  }
+
+  .machineBrand {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .roller {
+    width: 18px;
+    height: 18px;
+  }
+
+  .rollerKnob {
+    width: 14px;
+    height: 14px;
+  }
+
+  .rollerLeft {
+    left: -9px;
+  }
+
+  .rollerRight {
+    right: -9px;
+  }
+
+  .rollerKnobLeft {
+    left: -22px;
+  }
+
+  .rollerKnobRight {
+    right: -22px;
+  }
+}

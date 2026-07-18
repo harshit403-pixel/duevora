@@ -4,6 +4,7 @@ import RegisterPage from "../../features/auth/pages/RegisterPage";
 import VerifyEmailPage from "../../features/auth/pages/VerifyEmailPage";
 import ForgotPasswordPage from "../../features/auth/pages/ForgotPasswordPage";
 import ResetPasswordPage from "../../features/auth/pages/ResetPasswordPage";
+import OnboardingPage from "../../features/onboarding/ui/pages/OnboardingPage";
 import DashboardPage from "../../features/dashboard/pages/DashboardPage";
 
 import MainLayout from "../layouts/MainLayout";
@@ -12,6 +13,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 import PublicRoute from "../components/routes/PublicRoute";
 import ProtectedRoute from "../components/routes/ProtectedRoute";
+import OnboardingRoute from "../components/routes/OnboardingRoute";
 
 export const routes = [
   {
@@ -67,7 +69,17 @@ export const routes = [
   },
 
   {
-    element: <ProtectedRoute requireVerified />,
+    element: <OnboardingRoute />,
+    children: [
+      {
+        path: "/onboard",
+        element: <OnboardingPage />,
+      },
+    ],
+  },
+
+  {
+    element: <ProtectedRoute requireVerified requireOnboarding />,
     children: [
       {
         element: <DashboardLayout />,

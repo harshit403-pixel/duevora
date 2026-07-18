@@ -1,0 +1,48 @@
+.falling {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform-origin: top center;
+  will-change: transform, opacity;
+  border-radius: 0 0 2px 2px;
+}
+
+.stepLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 4px 0;
+}
+
+.stepNumber {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin: 0 0 2px 0;
+  line-height: 1;
+}
+
+.stepTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 4px 0;
+}
+
+.stepDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.fallingReceipt {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+}
