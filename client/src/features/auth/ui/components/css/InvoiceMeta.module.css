@@ -1,0 +1,43 @@
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: right;
+  min-width: 180px;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 24px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.label {
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.value {
+  font-weight: 700;
+  color: var(--color-accent);
+  font-family: "Courier New", Courier, monospace;
+  min-width: 120px;
+  text-align: left;
+}
+
+@media (max-width: 576px) {
+  .meta {
+    text-align: left;
+    min-width: auto;
+  }
+  .row {
+    justify-content: flex-start;
+  }
+  .value {
+    text-align: left;
+  }
+}

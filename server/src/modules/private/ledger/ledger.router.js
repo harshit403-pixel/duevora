@@ -5,7 +5,10 @@ import { getLedgerValidators } from "./ledger.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a ledger controller instance
 const controller = new LedgerController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new LedgerController();
 */
 router.get("/", authMiddleware, permissionMiddleware("ledger.view"), getLedgerValidators, controller.getLedger);
 
+// exporting the router
 export default router;

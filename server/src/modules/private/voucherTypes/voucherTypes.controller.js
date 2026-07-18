@@ -1,6 +1,8 @@
 // Importing modules
 import VoucherTypeDao from "../../../shared/dao/voucherType.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle voucher type operations
@@ -42,6 +44,7 @@ class VoucherTypesController {
             description: description || ""
         });
 
+        // returning the created voucher type
         return Created(res, "Voucher type created successfully", voucherType);
 
     }

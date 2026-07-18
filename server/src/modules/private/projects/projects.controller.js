@@ -1,36 +1,58 @@
 // Importing modules
 import ProjectDao from "../../../shared/dao/project.dao.js";
 import CustomerDao from "../../../shared/dao/customer.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
+// class to handle projects operations
 class ProjectsController {
 
     constructor() {
+
+        // initializing the project dao
         this.projectDao = new ProjectDao();
+
+        // initializing the customer dao
         this.customerDao = new CustomerDao();
+
     }
 
+    // create a new project
     createProject = async (req, res) => {
+
+        // extracting required fields from request body
         const { name, code, customerId, status } = req.body;
         const organizationId = req.user.organizationId;
 
+        // formatting project code to uppercase
         const formattedCode = code.trim().toUpperCase();
 
-        // validate customer if provided
+        // validating customer if provided
         if (customerId) {
+
             const customer = await this.customerDao.findOne({ _id: customerId, organizationId });
+
             if (!customer) {
+
                 throw new NotFound("Customer reference not found in your organization.");
+
             }
+
         }
 
+        // checking that project code is unique in organization context
         const existing = await this.projectDao.findOne({ organizationId, code: formattedCode });
+
         if (existing) {
+
             throw new Conflict("Project code already exists in your organization.");
+
         }
 
+        // creating project record using project dao
         const project = await this.projectDao.create({
             organizationId,
             name: name.trim(),
@@ -39,7 +61,9 @@ class ProjectsController {
             status: status || "active"
         });
 
+        // returning the created project
         return Created(res, "Project created successfully", project);
+
     }
 
 }

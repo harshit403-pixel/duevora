@@ -1,8 +1,10 @@
 // Importing modules
 import DepartmentDao from "../../../shared/dao/department.dao.js";
 import EmployeeDao from "../../../shared/dao/employee.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle department operations
@@ -60,6 +62,7 @@ class DepartmentsController {
             managerId: managerId || null
         });
 
+        // returning the created department
         return Created(res, "Department created successfully", department);
 
     }

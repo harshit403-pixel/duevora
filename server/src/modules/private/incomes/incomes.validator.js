@@ -4,13 +4,48 @@ import validateErrors from "../../../shared/utils/validateErrors.util.js";
 import mongoose from "mongoose";
 
 const createIncomeValidators = [
-    body("incomeNumber").notEmpty().withMessage("Income number is required").isString(),
-    body("date").notEmpty().withMessage("Date is required").isISO8601().withMessage("Date must be a valid ISO 8601 date"),
-    body("amount").notEmpty().withMessage("Amount is required").isFloat({ min: 0.01 }).withMessage("Amount must be greater than zero"),
-    body("categoryId").optional().custom((v) => v === null || mongoose.Types.ObjectId.isValid(v)).withMessage("Invalid Category ID"),
-    body("accountId").notEmpty().withMessage("Account reference is required").custom((v) => mongoose.Types.ObjectId.isValid(v)).withMessage("Invalid Account ID"),
-    body("description").optional().isString(),
+
+    // validating the incomeNumber field
+    body("incomeNumber")
+        .notEmpty()
+        .withMessage("Income number is required")
+        .isString(),
+
+    // validating the date field
+    body("date")
+        .notEmpty()
+        .withMessage("Date is required")
+        .isISO8601()
+        .withMessage("Date must be a valid ISO 8601 date"),
+
+    // validating the amount field
+    body("amount")
+        .notEmpty()
+        .withMessage("Amount is required")
+        .isFloat({ min: 0.01 })
+        .withMessage("Amount must be greater than zero"),
+
+    // validating the categoryId field
+    body("categoryId")
+        .optional()
+        .custom((v) => v === null || mongoose.Types.ObjectId.isValid(v))
+        .withMessage("Invalid Category ID"),
+
+    // validating the accountId field
+    body("accountId")
+        .notEmpty()
+        .withMessage("Account reference is required")
+        .custom((v) => mongoose.Types.ObjectId.isValid(v))
+        .withMessage("Invalid Account ID"),
+
+    // validating the description field
+    body("description")
+        .optional()
+        .isString(),
+
+    // validating errors
     validateErrors
+
 ];
 
 export { createIncomeValidators };

@@ -5,7 +5,10 @@ import { createQuotationValidators, approveQuotationValidators } from "./quotati
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a QuotationsController instance
 const controller = new QuotationsController();
 
 /*
@@ -22,4 +25,5 @@ router.post("/", authMiddleware, permissionMiddleware("quotations.create"), crea
 */
 router.post("/:quotationId/approve", authMiddleware, permissionMiddleware("quotations.update"), approveQuotationValidators, controller.approveQuotation);
 
+// exporting the router
 export default router;

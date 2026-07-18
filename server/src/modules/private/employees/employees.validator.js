@@ -4,14 +4,15 @@ import mongoose from "mongoose";
 import validateErrors from "../../../shared/utils/validateErrors.util.js";
 
 const inviteValidators = [
-    // validating email
+
+    // validating the email field
     body("email")
         .notEmpty()
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Email is invalid"),
 
-    // validating roleId
+    // validating the roleId field
     body("roleId")
         .notEmpty()
         .withMessage("Role ID is required")
@@ -20,51 +21,53 @@ const inviteValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 const createEmployeeValidators = [
-    // validating employeeCode
+
+    // validating the employeeCode field
     body("employeeCode")
         .notEmpty()
         .withMessage("Employee code is required")
         .isLength({ min: 2 })
         .withMessage("Employee code must be at least 2 characters long"),
 
-    // validating firstName
+    // validating the firstName field
     body("firstName")
         .notEmpty()
         .withMessage("First name is required"),
 
-    // validating lastName
+    // validating the lastName field
     body("lastName")
         .notEmpty()
         .withMessage("Last name is required"),
 
-    // validating email
+    // validating the email field
     body("email")
         .notEmpty()
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Email is invalid"),
 
-    // validating departmentId
+    // validating the departmentId field
     body("departmentId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Department ID"),
 
-    // validating userId
+    // validating the userId field
     body("userId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid User ID"),
 
-    // validating phone
+    // validating the phone field
     body("phone")
         .optional()
         .isString(),
 
-    // validating joiningDate
+    // validating the joiningDate field
     body("joiningDate")
         .optional()
         .isISO8601()
@@ -72,56 +75,58 @@ const createEmployeeValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 const bulkImportValidators = [
-    // validating employees array
+
+    // validating the employees array
     body("employees")
         .isArray({ min: 1 })
         .withMessage("Employees must be a non-empty array"),
 
-    // validating employeeCode inside array
+    // validating the employeeCode field inside array
     body("employees.*.employeeCode")
         .notEmpty()
         .withMessage("Employee code is required")
         .isLength({ min: 2 })
         .withMessage("Employee code must be at least 2 characters long"),
 
-    // validating firstName inside array
+    // validating the firstName field inside array
     body("employees.*.firstName")
         .notEmpty()
         .withMessage("First name is required"),
 
-    // validating lastName inside array
+    // validating the lastName field inside array
     body("employees.*.lastName")
         .notEmpty()
         .withMessage("Last name is required"),
 
-    // validating email inside array
+    // validating the email field inside array
     body("employees.*.email")
         .notEmpty()
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Email is invalid"),
 
-    // validating departmentId inside array
+    // validating the departmentId field inside array
     body("employees.*.departmentId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Department ID"),
 
-    // validating userId inside array
+    // validating the userId field inside array
     body("employees.*.userId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid User ID"),
 
-    // validating phone inside array
+    // validating the phone field inside array
     body("employees.*.phone")
         .optional()
         .isString(),
 
-    // validating joiningDate inside array
+    // validating the joiningDate field inside array
     body("employees.*.joiningDate")
         .optional()
         .isISO8601()
@@ -129,6 +134,7 @@ const bulkImportValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 export { inviteValidators, createEmployeeValidators, bulkImportValidators };

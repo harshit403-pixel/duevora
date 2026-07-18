@@ -5,7 +5,10 @@ import { onboardValidators } from "./organization.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a OrganizationController instance
 const orgController = new OrganizationController();
 
 /*
@@ -22,4 +25,5 @@ router.post("/", authMiddleware, onboardValidators, orgController.onboard);
 */
 router.get("/", authMiddleware, permissionMiddleware("organization.view"), orgController.getDetails);
 
+// exporting the router
 export default router;

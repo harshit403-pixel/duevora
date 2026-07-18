@@ -1,0 +1,29 @@
+.badge {
+  position: absolute;
+  bottom: 72px;
+  left: 48px;
+  padding: 8px 20px;
+  border: 1.5px dashed var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: rgba(248, 247, 244, 0.7);
+}
+
+@media (max-width: 991px) {
+  .badge {
+    bottom: 32px;
+    left: 24px;
+  }
+}
+
+@media (max-width: 576px) {
+  .badge {
+    bottom: 16px;
+    left: 16px;
+    font-size: 8px;
+    padding: 6px 14px;
+  }
+}

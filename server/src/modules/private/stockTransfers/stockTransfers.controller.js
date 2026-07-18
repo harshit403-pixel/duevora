@@ -5,8 +5,10 @@ import InventoryDao from "../../../shared/dao/inventory.dao.js";
 import StockMovementDao from "../../../shared/dao/stockMovement.dao.js";
 import WarehouseDao from "../../../shared/dao/warehouse.dao.js";
 import ProductDao from "../../../shared/dao/product.dao.js";
+
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Ok from "../../../shared/responses/Ok.response.js";
 import Created from "../../../shared/responses/Created.response.js";
 
@@ -15,11 +17,19 @@ class StockTransfersController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the stock transfer dao
         this.stockTransferDao = new StockTransferDao();
+
+        // initializing the inventory dao
         this.inventoryDao = new InventoryDao();
+
+        // initializing the stock movement dao
         this.stockMovementDao = new StockMovementDao();
+
+        // initializing the warehouse dao
         this.warehouseDao = new WarehouseDao();
+
+        // initializing the product dao
         this.productDao = new ProductDao();
 
     }
@@ -30,23 +40,52 @@ class StockTransfersController {
         const { fromWarehouseId, toWarehouseId, productId, quantity, transferDate } = req.body;
         const organizationId = req.user.organizationId;
 
-        if (fromWarehouseId === toWarehouseId) throw new BadRequest("Source and destination warehouses must be different.");
+        // validating source and destination warehouses are different
+        if (fromWarehouseId === toWarehouseId) {
 
+            throw new BadRequest("Source and destination warehouses must be different.");
+
+        }
+
+        // validating source warehouse exists in organization context
         const fromWh = await this.warehouseDao.findOne({ _id: fromWarehouseId, organizationId });
-        if (!fromWh) throw new NotFound("Source warehouse not found in your organization.");
 
+        if (!fromWh) {
+
+            throw new NotFound("Source warehouse not found in your organization.");
+
+        }
+
+        // validating destination warehouse exists in organization context
         const toWh = await this.warehouseDao.findOne({ _id: toWarehouseId, organizationId });
-        if (!toWh) throw new NotFound("Destination warehouse not found in your organization.");
 
+        if (!toWh) {
+
+            throw new NotFound("Destination warehouse not found in your organization.");
+
+        }
+
+        // validating referenced product exists in organization context
         const product = await this.productDao.findOne({ _id: productId, organizationId });
-        if (!product) throw new NotFound("Product not found in your organization.");
 
+        if (!product) {
+
+            throw new NotFound("Product not found in your organization.");
+
+        }
+
+        // creating stock transfer record using stock transfer dao
         const transfer = await this.stockTransferDao.create({
-            organizationId, fromWarehouseId, toWarehouseId, productId,
-            quantity, transferDate: transferDate ? new Date(transferDate) : new Date(),
+            organizationId,
+            fromWarehouseId,
+            toWarehouseId,
+            productId,
+            quantity,
+            transferDate: transferDate ? new Date(transferDate) : new Date(),
             status: "pending"
         });
 
+        // returning the created stock transfer
         return Created(res, "Stock transfer created successfully", transfer);
 
     }
@@ -151,6 +190,7 @@ class StockTransfersController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the approved stock transfer
             return Ok(res, "Stock transfer approved successfully", transfer);
 
         } catch (error) {

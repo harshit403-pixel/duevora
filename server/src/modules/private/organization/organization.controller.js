@@ -9,6 +9,7 @@ import UserDao from "../../../shared/dao/user.dao.js";
 import SessionDao from "../../../shared/dao/session.dao.js";
 
 import createSession from "../../../shared/utils/createSession.util.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -55,7 +56,7 @@ class OrganizationController {
 
         // checking if organization code already exists using the organization dao
         const existingOrg = await this.orgDao.findOne({ code: code.toUpperCase() });
-        
+
         if (existingOrg) {
 
             throw new Conflict("Organization code already exists");
@@ -79,6 +80,7 @@ class OrganizationController {
         ];
 
         const createdRoles = {};
+
         for (const r of rolesToCreate) {
 
             const createdRole = await this.roleDao.create({
@@ -87,12 +89,14 @@ class OrganizationController {
                 code: r.code,
                 description: r.description
             });
+
             createdRoles[r.code] = createdRole;
 
         }
 
         // binding all existing permissions to the ADMIN role
         const allPermissions = await this.permissionDao.find({});
+
         for (const p of allPermissions) {
 
             await this.rolePermissionDao.create({
@@ -123,6 +127,7 @@ class OrganizationController {
         const user = await this.userDao.findUserById(userId);
         const { sanitizedUser, accessToken } = await createSession(user, res, this.sessionDao);
 
+        // returning the onboarded organization with session data
         return Created(res, "Organization onboarded successfully", {
             user: sanitizedUser,
             organization,
@@ -136,7 +141,8 @@ class OrganizationController {
     getDetails = async (req, res) => {
 
         const organizationId = req.user.organizationId;
-        
+
+        // verifying user is associated with an organization
         if (!organizationId) {
 
             throw new Forbidden("User is not associated with any organization.");
@@ -145,13 +151,14 @@ class OrganizationController {
 
         // finding organization using organization dao
         const organization = await this.orgDao.findById(organizationId);
-        
+
         if (!organization) {
 
             throw new NotFound("Organization not found.");
 
         }
 
+        // returning the organization details
         return Ok(res, "Organization details retrieved successfully", organization);
 
     }

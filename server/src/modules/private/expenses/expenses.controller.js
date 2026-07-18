@@ -1,13 +1,16 @@
 // Importing modules
 import mongoose from "mongoose";
+
 import ExpenseDao from "../../../shared/dao/expense.dao.js";
 import CategoryDao from "../../../shared/dao/category.dao.js";
 import AccountDao from "../../../shared/dao/account.dao.js";
 import JournalEntryDao from "../../../shared/dao/journalEntry.dao.js";
 import JournalEntryLineDao from "../../../shared/dao/journalEntryLine.dao.js";
 import LedgerEntryDao from "../../../shared/dao/ledgerEntry.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle expense operations
@@ -15,12 +18,22 @@ class ExpensesController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the expense dao
         this.expenseDao = new ExpenseDao();
+
+        // initializing the category dao
         this.categoryDao = new CategoryDao();
+
+        // initializing the account dao
         this.accountDao = new AccountDao();
+
+        // initializing the journal entry dao
         this.journalEntryDao = new JournalEntryDao();
+
+        // initializing the journal entry line dao
         this.journalEntryLineDao = new JournalEntryLineDao();
+
+        // initializing the ledger entry dao
         this.ledgerEntryDao = new LedgerEntryDao();
 
     }
@@ -79,7 +92,7 @@ class ExpensesController {
 
             }
 
-            // getting or creating Expense debit account
+            // getting or creating expense debit account
             const expenseAccount = await this.getOrCreateAccount(
                 organizationId,
                 "Expense Account",
@@ -146,6 +159,7 @@ class ExpensesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the created expense
             return Created(res, "Expense recorded successfully", expense);
 
         } catch (error) {

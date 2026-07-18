@@ -5,7 +5,10 @@ import { createDeliveryChallanValidators } from "./deliveryChallans.validator.js
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a DeliveryChallans controller instance
 const controller = new DeliveryChallansController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new DeliveryChallansController();
 */
 router.post("/", authMiddleware, permissionMiddleware("deliveryChallans.create"), createDeliveryChallanValidators, controller.createDeliveryChallan);
 
+// exporting the router
 export default router;

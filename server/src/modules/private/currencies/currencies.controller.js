@@ -1,6 +1,8 @@
 // Importing modules
 import mongoose from "mongoose";
+
 import CurrencyDao from "../../../shared/dao/currency.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import Created from "../../../shared/responses/Created.response.js";
 
@@ -61,6 +63,7 @@ class CurrenciesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the created currency
             return Created(res, "Currency created successfully", currency);
 
         } catch (error) {

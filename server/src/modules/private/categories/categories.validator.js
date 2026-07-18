@@ -4,21 +4,22 @@ import validateErrors from "../../../shared/utils/validateErrors.util.js";
 import mongoose from "mongoose";
 
 const createCategoryValidators = [
-    // validating name field
+
+    // validating the name field
     body("name")
         .notEmpty()
         .withMessage("Category name is required")
         .isString()
         .withMessage("Category name must be a string"),
 
-    // validating code field
+    // validating the code field
     body("code")
         .notEmpty()
         .withMessage("Category code is required")
         .isString()
         .withMessage("Category code must be a string"),
 
-    // validating parentId field
+    // validating the parentId field
     body("parentId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
@@ -26,6 +27,7 @@ const createCategoryValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 export { createCategoryValidators };

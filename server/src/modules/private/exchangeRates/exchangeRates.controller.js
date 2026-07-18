@@ -1,7 +1,9 @@
 // Importing modules
 import ExchangeRateDao from "../../../shared/dao/exchangeRate.dao.js";
 import CurrencyDao from "../../../shared/dao/currency.dao.js";
+
 import NotFound from "../../../shared/errors/NotFound.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle exchange rate operations
@@ -9,8 +11,10 @@ class ExchangeRatesController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the exchange rate dao
         this.exchangeRateDao = new ExchangeRateDao();
+
+        // initializing the currency dao
         this.currencyDao = new CurrencyDao();
 
     }
@@ -41,6 +45,7 @@ class ExchangeRatesController {
             effectiveDate: new Date(effectiveDate)
         });
 
+        // returning the created exchange rate
         return Created(res, "Exchange rate created successfully", exchangeRate);
 
     }

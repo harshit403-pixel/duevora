@@ -5,7 +5,10 @@ import { createCategoryValidators } from "./categories.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a categories controller instance
 const controller = new CategoriesController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new CategoriesController();
 */
 router.post("/", authMiddleware, permissionMiddleware("categories.create"), createCategoryValidators, controller.createCategory);
 
+// exporting the router
 export default router;

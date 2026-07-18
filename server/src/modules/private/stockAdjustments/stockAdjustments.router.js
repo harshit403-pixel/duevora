@@ -8,7 +8,10 @@ import {
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a StockAdjustments controller instance
 const controller = new StockAdjustmentsController();
 
 /*
@@ -25,4 +28,5 @@ router.post("/", authMiddleware, permissionMiddleware("stockAdjustments.create")
 */
 router.post("/:adjustmentId/approve", authMiddleware, permissionMiddleware("stockAdjustments.update"), approveStockAdjustmentValidators, controller.approveStockAdjustment);
 
+// exporting the router
 export default router;

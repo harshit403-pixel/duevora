@@ -1,12 +1,15 @@
 // Importing modules
 import mongoose from "mongoose";
+
 import JournalEntryDao from "../../../shared/dao/journalEntry.dao.js";
 import JournalEntryLineDao from "../../../shared/dao/journalEntryLine.dao.js";
 import LedgerEntryDao from "../../../shared/dao/ledgerEntry.dao.js";
 import AccountDao from "../../../shared/dao/account.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle journal entry operations
@@ -14,10 +17,16 @@ class JournalEntriesController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the journal entry dao
         this.journalEntryDao = new JournalEntryDao();
+
+        // initializing the journal entry line dao
         this.journalEntryLineDao = new JournalEntryLineDao();
+
+        // initializing the ledger entry dao
         this.ledgerEntryDao = new LedgerEntryDao();
+
+        // initializing the account dao
         this.accountDao = new AccountDao();
 
     }
@@ -127,6 +136,7 @@ class JournalEntriesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the created journal entry
             return Created(res, "Journal entry recorded successfully", journalEntry);
 
         } catch (error) {

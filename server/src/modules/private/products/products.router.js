@@ -11,7 +11,10 @@ import {
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a ProductsController instance
 const controller = new ProductsController();
 
 /*
@@ -56,4 +59,5 @@ router.put("/:productId", authMiddleware, permissionMiddleware("products.update"
 */
 router.delete("/:productId", authMiddleware, permissionMiddleware("products.delete"), getProductValidators, controller.deleteProduct);
 
+// exporting the router
 export default router;

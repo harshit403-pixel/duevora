@@ -1,8 +1,10 @@
 // Importing modules
 import DeliveryChallanDao from "../../../shared/dao/deliveryChallan.dao.js";
 import CustomerDao from "../../../shared/dao/customer.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle delivery challan operations
@@ -10,8 +12,10 @@ class DeliveryChallansController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the delivery challan dao
         this.deliveryChallanDao = new DeliveryChallanDao();
+
+        // initializing the customer dao
         this.customerDao = new CustomerDao();
 
     }
@@ -55,6 +59,7 @@ class DeliveryChallansController {
             status: status || "draft"
         });
 
+        // returning the created delivery challan
         return Created(res, "Delivery challan created successfully", challan);
 
     }

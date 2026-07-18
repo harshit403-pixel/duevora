@@ -5,7 +5,10 @@ import { listStockMovementsValidators } from "./stockMovements.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a StockMovements controller instance
 const controller = new StockMovementsController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new StockMovementsController();
 */
 router.get("/", authMiddleware, permissionMiddleware("stockMovements.view"), listStockMovementsValidators, controller.listStockMovements);
 
+// exporting the router
 export default router;

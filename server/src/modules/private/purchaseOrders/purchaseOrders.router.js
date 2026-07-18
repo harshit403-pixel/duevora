@@ -5,7 +5,10 @@ import { createPurchaseOrderValidators } from "./purchaseOrders.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a PurchaseOrdersController instance
 const controller = new PurchaseOrdersController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new PurchaseOrdersController();
 */
 router.post("/", authMiddleware, permissionMiddleware("purchaseOrders.create"), createPurchaseOrderValidators, controller.createPurchaseOrder);
 
+// exporting the router
 export default router;

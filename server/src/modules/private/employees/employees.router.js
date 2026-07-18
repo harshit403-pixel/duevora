@@ -5,7 +5,10 @@ import { inviteValidators, createEmployeeValidators, bulkImportValidators } from
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a EmployeesController instance
 const controller = new EmployeesController();
 
 /*
@@ -29,4 +32,5 @@ router.post("/", authMiddleware, permissionMiddleware("employees.create"), creat
 */
 router.post("/bulk-import", authMiddleware, permissionMiddleware("employees.create"), bulkImportValidators, controller.bulkImportEmployees);
 
+// exporting the router
 export default router;

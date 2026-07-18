@@ -5,7 +5,10 @@ import { createTaxValidators } from "./taxes.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a Taxes controller instance
 const controller = new TaxesController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new TaxesController();
 */
 router.post("/", authMiddleware, permissionMiddleware("taxes.create"), createTaxValidators, controller.createTax);
 
+// exporting the router
 export default router;

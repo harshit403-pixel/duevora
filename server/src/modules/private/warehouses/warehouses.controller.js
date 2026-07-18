@@ -1,6 +1,8 @@
 // Importing modules
 import WarehouseDao from "../../../shared/dao/warehouse.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle warehouse operations
@@ -40,6 +42,7 @@ class WarehousesController {
             status: status || "active"
         });
 
+        // returning the created warehouse
         return Created(res, "Warehouse created successfully", warehouse);
 
     }

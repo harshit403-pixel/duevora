@@ -42,7 +42,7 @@ router.post("/forgot-password", forgotPasswordValidators, authController.forgotP
 /*
     @route POST /api/auth/reset-password
     @desc Reset password
-    @access Public  
+    @access Public
 */
 router.post("/reset-password", resetPasswordValidators, authController.resetPassword);
 

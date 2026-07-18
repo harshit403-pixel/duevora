@@ -1,5 +1,6 @@
 // Importing modules
 import LedgerEntryDao from "../../../shared/dao/ledgerEntry.dao.js";
+
 import Ok from "../../../shared/responses/Ok.response.js";
 
 // class to handle ledger operations
@@ -28,12 +29,14 @@ class LedgerController {
             organizationId
         };
 
+        // filtering by accountId if provided
         if (accountId) {
 
             filter.accountId = accountId;
 
         }
 
+        // filtering by date range if provided
         if (startDate || endDate) {
 
             filter.date = {};
@@ -75,6 +78,7 @@ class LedgerController {
             }
         };
 
+        // returning the paginated ledger entries
         return Ok(res, "Ledger entries retrieved successfully", data);
 
     }

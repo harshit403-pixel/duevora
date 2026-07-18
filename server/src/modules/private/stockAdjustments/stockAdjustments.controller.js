@@ -6,8 +6,10 @@ import WarehouseDao from "../../../shared/dao/warehouse.dao.js";
 import EmployeeDao from "../../../shared/dao/employee.dao.js";
 import InventoryDao from "../../../shared/dao/inventory.dao.js";
 import StockMovementDao from "../../../shared/dao/stockMovement.dao.js";
+
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -16,12 +18,22 @@ class StockAdjustmentsController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the stock adjustment dao
         this.stockAdjustmentDao = new StockAdjustmentDao();
+
+        // initializing the product dao
         this.productDao = new ProductDao();
+
+        // initializing the warehouse dao
         this.warehouseDao = new WarehouseDao();
+
+        // initializing the employee dao
         this.employeeDao = new EmployeeDao();
+
+        // initializing the inventory dao
         this.inventoryDao = new InventoryDao();
+
+        // initializing the stock movement dao
         this.stockMovementDao = new StockMovementDao();
 
     }
@@ -83,6 +95,7 @@ class StockAdjustmentsController {
             status: "Draft"
         });
 
+        // returning the created stock adjustment
         return Created(res, "Stock adjustment created successfully", adjustment);
 
     }
@@ -158,6 +171,7 @@ class StockAdjustmentsController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the approved stock adjustment
             return Ok(res, "Stock adjustment approved successfully", adjustment);
 
         } catch (error) {

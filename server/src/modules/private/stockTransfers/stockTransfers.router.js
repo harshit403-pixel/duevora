@@ -5,7 +5,10 @@ import { createStockTransferValidators, approveStockTransferValidators } from ".
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a StockTransfers controller instance
 const controller = new StockTransfersController();
 
 /*
@@ -22,4 +25,5 @@ router.post("/", authMiddleware, permissionMiddleware("stockTransfers.create"), 
 */
 router.post("/:transferId/approve", authMiddleware, permissionMiddleware("stockTransfers.update"), approveStockTransferValidators, controller.approveStockTransfer);
 
+// exporting the router
 export default router;

@@ -1,5 +1,6 @@
 // Importing modules
 import mongoose from "mongoose";
+
 import PaymentDao from "../../../shared/dao/payment.dao.js";
 import PurchaseDao from "../../../shared/dao/purchase.dao.js";
 import VendorDao from "../../../shared/dao/vendor.dao.js";
@@ -7,9 +8,11 @@ import AccountDao from "../../../shared/dao/account.dao.js";
 import JournalEntryDao from "../../../shared/dao/journalEntry.dao.js";
 import JournalEntryLineDao from "../../../shared/dao/journalEntryLine.dao.js";
 import LedgerEntryDao from "../../../shared/dao/ledgerEntry.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle payment operations
@@ -17,13 +20,25 @@ class PaymentsController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the payment dao
         this.paymentDao = new PaymentDao();
+
+        // initializing the purchase dao
         this.purchaseDao = new PurchaseDao();
+
+        // initializing the vendor dao
         this.vendorDao = new VendorDao();
+
+        // initializing the account dao
         this.accountDao = new AccountDao();
+
+        // initializing the journal entry dao
         this.journalEntryDao = new JournalEntryDao();
+
+        // initializing the journal entry line dao
         this.journalEntryLineDao = new JournalEntryLineDao();
+
+        // initializing the ledger entry dao
         this.ledgerEntryDao = new LedgerEntryDao();
 
     }
@@ -31,6 +46,7 @@ class PaymentsController {
     // create a new payment
     createPayment = async (req, res) => {
 
+        // extracting required fields from request body
         const { vendorId, purchaseId, paymentNumber, paymentDate, amount, paymentMethod, accountId } = req.body;
         const organizationId = req.user.organizationId;
 
@@ -188,6 +204,7 @@ class PaymentsController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning the created payment
             return Created(res, "Payment settlement recorded successfully", payment);
 
         } catch (error) {
@@ -208,11 +225,13 @@ class PaymentsController {
     // helper to get or create account
     getOrCreateAccount = async (organizationId, name, code, type, session) => {
 
+        // searching for existing account by organization and code
         let account = await this.accountDao.Model.findOne({
             organizationId,
             code
         }).session(session);
 
+        // creating the account if it does not exist
         if (!account) {
 
             account = new this.accountDao.Model({

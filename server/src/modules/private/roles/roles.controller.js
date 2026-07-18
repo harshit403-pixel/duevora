@@ -3,9 +3,11 @@ import mongoose from "mongoose";
 import RoleDao from "../../../shared/dao/role.dao.js";
 import RolePermissionDao from "../../../shared/dao/rolePermission.dao.js";
 import PermissionDao from "../../../shared/dao/permission.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
 import BadRequest from "../../../shared/errors/BadRequest.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 import Ok from "../../../shared/responses/Ok.response.js";
 
@@ -51,6 +53,7 @@ class RolesController {
             description: description || ""
         });
 
+        // returning the created role
         return Created(res, "Role created successfully", role);
 
     }
@@ -106,6 +109,7 @@ class RolesController {
             // committing transaction
             await session.commitTransaction();
 
+            // returning success response
             return Ok(res, "Permissions bound to role successfully");
 
         } catch (error) {

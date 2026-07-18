@@ -22,12 +22,14 @@ class InventoryController {
             organizationId
         };
 
+        // filtering by productId if provided
         if (productId) {
 
             filter.productId = productId;
 
         }
 
+        // filtering by warehouseId if provided
         if (warehouseId) {
 
             filter.warehouseId = warehouseId;
@@ -51,6 +53,7 @@ class InventoryController {
         // constructing pagination metadata
         const pages = Math.ceil(total / limit);
 
+        // returning the paginated inventory list
         return res.status(200).json({
             success: true,
             status: 200,

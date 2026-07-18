@@ -4,50 +4,51 @@ import validateErrors from "../../../shared/utils/validateErrors.util.js";
 import mongoose from "mongoose";
 
 const createProductValidators = [
-    // validating name field
+
+    // validating the name field
     body("name")
         .notEmpty()
         .withMessage("Product name is required")
         .isLength({ min: 2 })
         .withMessage("Product name must be at least 2 characters long"),
 
-    // validating sku field
+    // validating the sku field
     body("sku")
         .notEmpty()
         .withMessage("SKU is required")
         .isString()
         .withMessage("SKU must be a string"),
 
-    // validating description field
+    // validating the description field
     body("description")
         .optional()
         .isString(),
 
-    // validating categoryId field
+    // validating the categoryId field
     body("categoryId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Category ID"),
 
-    // validating unitId field
+    // validating the unitId field
     body("unitId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Unit ID"),
 
-    // validating price field
+    // validating the price field
     body("price")
         .optional()
         .isFloat({ min: 0 })
         .withMessage("Price must be a non-negative number"),
 
-    // validating cost field
+    // validating the cost field
     body("cost")
         .optional()
         .isFloat({ min: 0 })
         .withMessage("Cost must be a non-negative number"),
 
-    // validating status field
+    // validating the status field
     body("status")
         .optional()
         .isIn(["active", "inactive"])
@@ -55,34 +56,36 @@ const createProductValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 const listProductsValidators = [
-    // validating page query param
+
+    // validating the page query param
     query("page")
         .optional()
         .isInt({ min: 1 })
         .withMessage("Page must be a positive integer"),
 
-    // validating limit query param
+    // validating the limit query param
     query("limit")
         .optional()
         .isInt({ min: 1, max: 100 })
         .withMessage("Limit must be an integer between 1 and 100"),
 
-    // validating sortBy query param
+    // validating the sortBy query param
     query("sortBy")
         .optional()
         .isString()
         .withMessage("sortBy must be a string"),
 
-    // validating sortOrder query param
+    // validating the sortOrder query param
     query("sortOrder")
         .optional()
         .isIn(["asc", "desc"])
         .withMessage("Sort order must be asc or desc"),
 
-    // validating search query param
+    // validating the search query param
     query("search")
         .optional()
         .isString()
@@ -90,10 +93,12 @@ const listProductsValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 const getProductValidators = [
-    // validating productId param
+
+    // validating the productId param
     param("productId")
         .notEmpty()
         .withMessage("Product ID is required")
@@ -102,58 +107,60 @@ const getProductValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 const updateProductValidators = [
-    // validating productId param
+
+    // validating the productId param
     param("productId")
         .notEmpty()
         .withMessage("Product ID is required")
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Product ID"),
 
-    // validating name field
+    // validating the name field
     body("name")
         .optional()
         .isLength({ min: 2 })
         .withMessage("Product name must be at least 2 characters long"),
 
-    // validating sku field
+    // validating the sku field
     body("sku")
         .optional()
         .isString()
         .withMessage("SKU must be a string"),
 
-    // validating description field
+    // validating the description field
     body("description")
         .optional()
         .isString(),
 
-    // validating categoryId field
+    // validating the categoryId field
     body("categoryId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Category ID"),
 
-    // validating unitId field
+    // validating the unitId field
     body("unitId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Unit ID"),
 
-    // validating price field
+    // validating the price field
     body("price")
         .optional()
         .isFloat({ min: 0 })
         .withMessage("Price must be a non-negative number"),
 
-    // validating cost field
+    // validating the cost field
     body("cost")
         .optional()
         .isFloat({ min: 0 })
         .withMessage("Cost must be a non-negative number"),
 
-    // validating status field
+    // validating the status field
     body("status")
         .optional()
         .isIn(["active", "inactive"])
@@ -161,51 +168,53 @@ const updateProductValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 const bulkImportProductsValidators = [
-    // validating products array
+
+    // validating the products field
     body("products")
         .isArray({ min: 1 })
         .withMessage("Products must be a non-empty array"),
 
-    // validating name field inside array
+    // validating the name field inside array
     body("products.*.name")
         .notEmpty()
         .withMessage("Product name is required")
         .isLength({ min: 2 })
         .withMessage("Product name must be at least 2 characters long"),
 
-    // validating sku field inside array
+    // validating the sku field inside array
     body("products.*.sku")
         .notEmpty()
         .withMessage("SKU is required")
         .isString(),
 
-    // validating description field inside array
+    // validating the description field inside array
     body("products.*.description")
         .optional()
         .isString(),
 
-    // validating categoryId field inside array
+    // validating the categoryId field inside array
     body("products.*.categoryId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Category ID"),
 
-    // validating unitId field inside array
+    // validating the unitId field inside array
     body("products.*.unitId")
         .optional()
         .custom((value) => mongoose.Types.ObjectId.isValid(value))
         .withMessage("Invalid Unit ID"),
 
-    // validating price field inside array
+    // validating the price field inside array
     body("products.*.price")
         .optional()
         .isFloat({ min: 0 })
         .withMessage("Price must be a non-negative number"),
 
-    // validating cost field inside array
+    // validating the cost field inside array
     body("products.*.cost")
         .optional()
         .isFloat({ min: 0 })
@@ -213,6 +222,7 @@ const bulkImportProductsValidators = [
 
     // validating errors
     validateErrors
+
 ];
 
 export {

@@ -5,7 +5,10 @@ import { createCurrencyValidators } from "./currencies.validator.js";
 import authMiddleware from "../../../shared/middlewares/auth.middleware.js";
 import permissionMiddleware from "../../../shared/middlewares/permission.middleware.js";
 
+// making the router
 const router = express.Router();
+
+// creating a Currencies controller instance
 const controller = new CurrenciesController();
 
 /*
@@ -15,4 +18,5 @@ const controller = new CurrenciesController();
 */
 router.post("/", authMiddleware, permissionMiddleware("currencies.create"), createCurrencyValidators, controller.createCurrency);
 
+// exporting the router
 export default router;

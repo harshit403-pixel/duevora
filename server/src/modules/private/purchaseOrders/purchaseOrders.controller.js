@@ -1,8 +1,10 @@
 // Importing modules
 import PurchaseOrderDao from "../../../shared/dao/purchaseOrder.dao.js";
 import VendorDao from "../../../shared/dao/vendor.dao.js";
+
 import Conflict from "../../../shared/errors/Conflict.error.js";
 import NotFound from "../../../shared/errors/NotFound.error.js";
+
 import Created from "../../../shared/responses/Created.response.js";
 
 // class to handle purchase order operations
@@ -10,8 +12,10 @@ class PurchaseOrdersController {
 
     constructor() {
 
-        // initializing the daos
+        // initializing the purchase order dao
         this.purchaseOrderDao = new PurchaseOrderDao();
+
+        // initializing the vendor dao
         this.vendorDao = new VendorDao();
 
     }
@@ -19,6 +23,7 @@ class PurchaseOrdersController {
     // create a new purchase order
     createPurchaseOrder = async (req, res) => {
 
+        // extracting required fields from request body
         const { vendorId, poNumber, poDate, grandTotal, status } = req.body;
         const organizationId = req.user.organizationId;
 
@@ -56,6 +61,7 @@ class PurchaseOrdersController {
             status: status || "draft"
         });
 
+        // returning the created purchase order
         return Created(res, "Purchase order created successfully", po);
 
     }

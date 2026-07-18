@@ -32,7 +32,7 @@ router.post("/logout-all", authMiddleware, getRefreshTokenFromCookie, authContro
 */
 router.post("/refresh", getRefreshTokenFromCookie, authController.refresh);
 
-/* 
+/*
     @route GET /api/auth/me
     @desc Get user details
     @access Private

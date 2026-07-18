@@ -1,11 +1,12 @@
-import React from 'react'
+import { useEffect } from "react";
 
-const DashboardPage = () => {
-  return (
-    <div>
-      dashboardPgae
-    </div>
-  )
+export default function DashboardPage() {
+  useEffect(() => {
+    const channel = new BroadcastChannel("google-auth");
+    channel.postMessage({ type: "google-auth-success" });
+    channel.close();
+    window.close();
+  }, []);
+
+  return <h1>Signing you in...</h1>;
 }
-
-export default DashboardPage
