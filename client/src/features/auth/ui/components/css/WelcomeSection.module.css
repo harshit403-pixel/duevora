@@ -1,0 +1,42 @@
+.section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 0;
+  gap: 24px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.billTo {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.description {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .heading {
+    font-size: 17px;
+  }
+}

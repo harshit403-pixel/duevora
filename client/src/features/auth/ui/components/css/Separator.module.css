@@ -1,0 +1,22 @@
+.separator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px 0;
+}
+
+.line {
+  flex: 1;
+  height: 0;
+  border-top: 2px dashed var(--color-border);
+}
+
+.text {
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}

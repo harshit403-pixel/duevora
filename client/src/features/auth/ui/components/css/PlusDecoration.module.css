@@ -1,0 +1,23 @@
+.plus {
+  position: absolute;
+  top: 72px;
+  right: 48px;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--color-accent);
+  line-height: 1;
+}
+
+@media (max-width: 991px) {
+  .plus {
+    top: 32px;
+    right: 24px;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 576px) {
+  .plus {
+    display: none;
+  }
+}

@@ -10,7 +10,7 @@ const router = express.Router();
     @desc checks server health
     @access Public
 */
-router.get((req, res) => {
+router.get("/", (req, res) => {
    
     // sending Ok as response
     Ok(res, "Server is healthy");

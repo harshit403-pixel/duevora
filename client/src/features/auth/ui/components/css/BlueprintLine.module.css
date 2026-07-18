@@ -1,0 +1,24 @@
+.line {
+  position: absolute;
+  height: 1px;
+  background: var(--color-accent);
+  opacity: 0.3;
+}
+
+.lineLeft {
+  top: 50%;
+  left: 0;
+  width: 22%;
+}
+
+.lineRight {
+  bottom: 34%;
+  right: 0;
+  width: 20%;
+}
+
+@media (max-width: 576px) {
+  .line {
+    display: none;
+  }
+}
