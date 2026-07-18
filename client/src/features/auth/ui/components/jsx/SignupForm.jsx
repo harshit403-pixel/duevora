@@ -5,12 +5,12 @@ import PasswordField from "./PasswordField";
 import LoginButton from "./LoginButton";
 import Separator from "./Separator";
 import GoogleButton from "./GoogleButton";
+import SwitchText from "./SwitchText";
 
-export default function SignupForm({ onSignup, onGoogleLogin, isLoading }) {
+export default function SignupForm({ onSignup, onGoogleLogin, isLoading, onSwitch }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -46,19 +46,17 @@ export default function SignupForm({ onSignup, onGoogleLogin, isLoading }) {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <PasswordField
-        label="CONFIRM PASSWORD"
-        name="confirmPassword"
-        placeholder="Confirm your password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-      />
-
       <LoginButton isLoading={isLoading} text="SIGNUP" />
 
       <Separator text="OR" />
 
       <GoogleButton onClick={onGoogleLogin} />
+
+      <SwitchText
+        text="Already have an account?"
+        actionText="Login"
+        onSwitch={onSwitch}
+      />
     </form>
   );
 }
