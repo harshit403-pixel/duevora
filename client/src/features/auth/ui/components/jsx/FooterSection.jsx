@@ -5,7 +5,7 @@ export default function FooterSection() {
     <div className={styles.footer}>
       <div className={styles.info}>
         <span className={styles.thankYou}>Thank you for choosing DUEVORA.</span>
-        <span className={styles.subText}>Let&apos;s build something amazing.</span>
+        <span className={styles.subText}>Let&apos;s manage your finances smarter.</span>
       </div>
       <div className={styles.total}>
         <span className={styles.totalLabel}>TOTAL</span>

@@ -13,7 +13,7 @@ export default function LogoSection() {
       />
       <div className={styles.brandText}>
         <div className={styles.brandName}>DUEVORA</div>
-        <div className={styles.brandTagline}>Build. Ship. Repeat.</div>
+        <div className={styles.brandTagline}>Smart Finance. Simplified.</div>
       </div>
     </div>
   );

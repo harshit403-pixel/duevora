@@ -11,7 +11,7 @@ export default function BlueprintDecorations() {
       <SideLabel position="top">
         DUEVORA
         <br />
-        Build. Ship. Repeat.
+        Smart Finance. Simplified.
       </SideLabel>
 
       <div className={`${styles.dotGrid} ${styles.dotGridLeft}`}>
