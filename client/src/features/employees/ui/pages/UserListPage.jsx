@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usersApi, rolesApi, employeesApi } from "../../api/employeesApi";
 import {
@@ -11,11 +12,13 @@ import {
   Avatar,
   AccessDenied,
 } from "../../../../app/components/common";
+import useNotification from "../../../../app/components/notification/useNotification";
 import { HiPlus, HiOutlineUserPlus, HiOutlineShieldCheck, HiOutlineClipboard } from "react-icons/hi2";
 import s from "../css/UserList.module.css";
 
 export default function UserListPage() {
   const queryClient = useQueryClient();
+  const { success, error: notifyError } = useNotification();
   const [activeTab, setActiveTab] = useState("users");
   const [permissionError, setPermissionError] = useState(false);
 
@@ -115,7 +118,7 @@ export default function UserListPage() {
       setInviteEmail("");
       queryClient.invalidateQueries(["usersList"]);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to invite member");
+      notifyError(err.response?.data?.message || "Failed to invite member");
     } finally {
       setInviteLoading(false);
     }
@@ -134,7 +137,7 @@ export default function UserListPage() {
       setIsCreateRoleOpen(false);
       refetchRoles();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to create role");
+      notifyError(err.response?.data?.message || "Failed to create role");
     } finally {
       setRoleLoading(false);
     }
@@ -148,10 +151,10 @@ export default function UserListPage() {
       await rolesApi.setPermissions(activeRoleId, {
         permissionIds: Array.from(selectedPermissions),
       });
-      alert("Permissions updated successfully!");
+      success("Permissions updated successfully!");
       refetchRoles();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to save permissions");
+      notifyError(err.response?.data?.message || "Failed to save permissions");
     } finally {
       setSavePermissionsLoading(false);
     }
@@ -318,8 +321,8 @@ export default function UserListPage() {
                 onClick={() => {
                   const input = document.getElementById("invite-url-input");
                   input.select();
-                  document.execCommand("copy");
-                  alert("Link copied to clipboard!");
+                  navigator.clipboard.writeText(input.value);
+                  success("Link copied to clipboard!");
                 }}
                 variant="secondary"
               >

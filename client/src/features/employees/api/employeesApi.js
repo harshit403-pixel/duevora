@@ -16,6 +16,16 @@ export const employeesApi = {
     return response.data;
   },
 
+  update: async (id, data) => {
+    const response = await api.put(`/employees/${id}`, data);
+    return response.data;
+  },
+
+  remove: async (id) => {
+    const response = await api.delete(`/employees/${id}`);
+    return response.data;
+  },
+
   invite: async (data) => {
     const response = await api.post("/employees/invite", data);
     return response.data;
@@ -30,6 +40,11 @@ export const employeesApi = {
 export const usersApi = {
   list: async (params) => {
     const response = await api.get("/users", { params });
+    return response.data;
+  },
+
+  getById: async (id) => {
+    const response = await api.get(`/users/${id}`);
     return response.data;
   },
 
@@ -50,8 +65,23 @@ export const departmentsApi = {
     return response.data;
   },
 
+  getById: async (id) => {
+    const response = await api.get(`/departments/${id}`);
+    return response.data;
+  },
+
   create: async (data) => {
     const response = await api.post("/departments", data);
+    return response.data;
+  },
+
+  update: async (id, data) => {
+    const response = await api.put(`/departments/${id}`, data);
+    return response.data;
+  },
+
+  remove: async (id) => {
+    const response = await api.delete(`/departments/${id}`);
     return response.data;
   },
 };
@@ -62,8 +92,23 @@ export const rolesApi = {
     return response.data;
   },
 
+  getById: async (id) => {
+    const response = await api.get(`/roles/${id}`);
+    return response.data;
+  },
+
   create: async (data) => {
     const response = await api.post("/roles", data);
+    return response.data;
+  },
+
+  update: async (id, data) => {
+    const response = await api.put(`/roles/${id}`, data);
+    return response.data;
+  },
+
+  remove: async (id) => {
+    const response = await api.delete(`/roles/${id}`);
     return response.data;
   },
 

@@ -102,7 +102,6 @@ export default function DataTable({
               )}
             </div>
           ))}
-          <div className={[s.cell, s.headerCell].join(" ")} style={{ width: 48 }} />
         </div>
 
         {/* Body */}

@@ -125,6 +125,7 @@ class RolesController {
 
         }
 
+    }
     // list roles for the current organization
     listRoles = async (req, res) => {
 

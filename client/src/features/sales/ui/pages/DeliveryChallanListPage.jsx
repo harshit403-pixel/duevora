@@ -1,18 +1,3 @@
-import { PageHeader } from "../../../../app/components/common";
-import { EmptyState } from "../../../../app/components/common";
-import { HiOutlineInbox } from "react-icons/hi2";
-
-export default function DeliveryChallanListPage() {
-  return (
-    <div style={{ maxWidth: 1440, margin: "0 auto" }}>
-      <PageHeader
-        title="Delivery Challans"
-        subtitle="Manage your delivery challans"
-      />
-      <EmptyState
-        title="No items yet"
-        description="Create your first item to get started."
-      />
-    </div>
-  );
-}
+import TransactionDocumentPage from "../components/TransactionDocumentPage";
+import { salesApi } from "../../api/salesApi";
+export default function DeliveryChallanListPage() { return <TransactionDocumentPage title="Delivery Challans" subtitle="Record customer deliveries and dispatches." kind="challan" create={salesApi.createDeliveryChallan} />; }
