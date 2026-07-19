@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { settingsApi } from "../../api/settingsApi";
-import { Button, DataTable, Modal, PageHeader } from "../../../../app/components/common";
+import { Button, DataTable, Modal, PageHeader, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 
@@ -72,21 +72,53 @@ export default function ExchangeRateListPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <label>
               From Currency
-              <select required value={form.fromCurrency} onChange={(e) => setForm({ ...form, fromCurrency: e.target.value })} style={field}>
-                <option value="">Select</option>
-                {currencies.map((c) => (
-                  <option key={c._id} value={c.code || c._id}>{c.code} — {c.name}</option>
-                ))}
-              </select>
+              <div style={{ marginTop: 5 }}>
+                <SearchableSelect
+                  value={form.fromCurrency}
+                  onChange={(val) => setForm({ ...form, fromCurrency: val })}
+                  options={currencies.map((c) => ({ value: c._id, label: `${c.code} — ${c.name}` }))}
+                  placeholder="Select"
+                  loading={currenciesQuery.isLoading}
+                  createForm={({ onCreated, onClose }) => (
+                    <QuickCreateForm
+                      fields={[
+                        { name: "code", label: "Currency Code", required: true, placeholder: "e.g. USD" },
+                        { name: "name", label: "Currency Name", required: true, placeholder: "e.g. US Dollar" },
+                        { name: "symbol", label: "Symbol", placeholder: "e.g. $" },
+                        { name: "exchangeRate", label: "Exchange Rate", type: "number", placeholder: "1.00" },
+                      ]}
+                      apiFn={(data) => settingsApi.createCurrency(data)}
+                      onCreated={onCreated}
+                      onClose={onClose}
+                    />
+                  )}
+                />
+              </div>
             </label>
             <label>
               To Currency
-              <select required value={form.toCurrency} onChange={(e) => setForm({ ...form, toCurrency: e.target.value })} style={field}>
-                <option value="">Select</option>
-                {currencies.map((c) => (
-                  <option key={c._id} value={c.code || c._id}>{c.code} — {c.name}</option>
-                ))}
-              </select>
+              <div style={{ marginTop: 5 }}>
+                <SearchableSelect
+                  value={form.toCurrency}
+                  onChange={(val) => setForm({ ...form, toCurrency: val })}
+                  options={currencies.map((c) => ({ value: c._id, label: `${c.code} — ${c.name}` }))}
+                  placeholder="Select"
+                  loading={currenciesQuery.isLoading}
+                  createForm={({ onCreated, onClose }) => (
+                    <QuickCreateForm
+                      fields={[
+                        { name: "code", label: "Currency Code", required: true, placeholder: "e.g. USD" },
+                        { name: "name", label: "Currency Name", required: true, placeholder: "e.g. US Dollar" },
+                        { name: "symbol", label: "Symbol", placeholder: "e.g. $" },
+                        { name: "exchangeRate", label: "Exchange Rate", type: "number", placeholder: "1.00" },
+                      ]}
+                      apiFn={(data) => settingsApi.createCurrency(data)}
+                      onCreated={onCreated}
+                      onClose={onClose}
+                    />
+                  )}
+                />
+              </div>
             </label>
           </div>
           <label>

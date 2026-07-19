@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { employeesApi } from "../../api/employeesApi";
-import { PageHeader, Button, DataTable, StatusBadge, Modal } from "../../../../app/components/common";
+import { PageHeader, Button, DataTable, StatusBadge, Modal, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 import { HiOutlineDocumentArrowDown } from "react-icons/hi2";
@@ -65,7 +65,32 @@ export default function EmployeeAttendancePage() {
 
       <Modal isOpen={isMarkOpen} onClose={() => setIsMarkOpen(false)} title="Mark Attendance">
         <form onSubmit={(e) => { e.preventDefault(); markAttendance.mutate(form); }} style={{ display: "grid", gap: 14 }}>
-          <label>Employee<select required value={form.employeeId} onChange={(e) => setForm({ ...form, employeeId: e.target.value })} style={input}><option value="">Select employee</option>{employees.map((emp) => <option key={emp._id} value={emp._id}>{emp.firstName} {emp.lastName}</option>)}</select></label>
+          <label>Employee
+            <div style={{ marginTop: 5 }}>
+              <SearchableSelect
+                value={form.employeeId}
+                onChange={(val) => setForm({ ...form, employeeId: val })}
+                options={employees.map((e) => ({ value: e._id, label: `${e.firstName} ${e.lastName}` }))}
+                placeholder="Select employee"
+                loading={isLoading}
+                createForm={({ onCreated, onClose }) => (
+                  <QuickCreateForm
+                    fields={[
+                      { name: "firstName", label: "First Name", required: true, placeholder: "First name" },
+                      { name: "lastName", label: "Last Name", required: true, placeholder: "Last name" },
+                      { name: "email", label: "Email", type: "email", required: true, placeholder: "email@company.com" },
+                      { name: "phone", label: "Phone", placeholder: "+1 (555) 000-0000" },
+                      { name: "designation", label: "Designation", placeholder: "Job title" },
+                      { name: "department", label: "Department", placeholder: "Department name" },
+                    ]}
+                    apiFn={(data) => employeesApi.create(data)}
+                    onCreated={onCreated}
+                    onClose={onClose}
+                  />
+                )}
+              />
+            </div>
+          </label>
           <label>Date<input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} style={input} /></label>
           <label>Status<select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} style={input}><option value="present">Present</option><option value="absent">Absent</option><option value="late">Late</option><option value="half_day">Half Day</option></select></label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>

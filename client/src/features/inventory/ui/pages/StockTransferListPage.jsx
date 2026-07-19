@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus, HiCheck, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { inventoryApi } from "../../api/inventoryApi";
-import { Button, DataTable, Modal, PageHeader } from "../../../../app/components/common";
+import { productsApi } from "../../../products/api/productsApi";
+import { Button, DataTable, Modal, PageHeader, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 
@@ -23,6 +24,12 @@ export default function StockTransferListPage() {
 
   const { data, isLoading } = useQuery({ queryKey: ["stockTransfers"], queryFn: () => inventoryApi.listStockTransfers() });
   const items = data?.data || [];
+
+  const warehousesQuery = useQuery({ queryKey: ["warehouses"], queryFn: () => inventoryApi.listWarehouses() });
+  const warehouseOptions = (warehousesQuery.data?.data || []).map((w) => ({ value: w._id, label: w.name || w.warehouseName || "—" }));
+
+  const productsQuery = useQuery({ queryKey: ["products"], queryFn: () => productsApi.list() });
+  const productOptions = (productsQuery.data?.data || []).map((p) => ({ value: p._id, label: p.name || p.sku || "—" }));
 
   const approve = useMutation({
     mutationFn: (id) => inventoryApi.approveStockTransfer(id),
@@ -109,17 +116,75 @@ export default function StockTransferListPage() {
       <Modal isOpen={open} onClose={() => setOpen(false)} title="Create stock transfer">
         <form onSubmit={submit} style={{ display: "grid", gap: 14 }}>
           <label>
-            Product ID
-            <input required value={form.productId} onChange={(e) => setForm({ ...form, productId: e.target.value })} style={field} />
+            Product
+            <div style={{ marginTop: 5 }}>
+              <SearchableSelect
+                value={form.productId}
+                onChange={(val) => setForm({ ...form, productId: val })}
+                options={productOptions}
+                placeholder="Select product"
+                loading={productsQuery.isLoading}
+                createForm={({ onCreated, onClose }) => (
+                  <QuickCreateForm
+                    fields={[
+                      { name: "name", label: "Product Name", required: true, placeholder: "Enter product name" },
+                      { name: "sku", label: "SKU", required: true, placeholder: "Stock keeping unit" },
+                      { name: "description", label: "Description", placeholder: "Product description", type: "textarea" },
+                      { name: "category", label: "Category", placeholder: "Product category" },
+                      { name: "unit", label: "Unit", placeholder: "e.g. pcs, kg, litre" },
+                      { name: "sellingPrice", label: "Selling Price", type: "number", placeholder: "0.00" },
+                      { name: "costPrice", label: "Cost Price", type: "number", placeholder: "0.00" },
+                      { name: "quantity", label: "Opening Stock", type: "number", placeholder: "0" },
+                      { name: "lowStockAlert", label: "Low Stock Alert", type: "number", placeholder: "Minimum stock level" },
+                    ]}
+                    apiFn={(data) => productsApi.create(data)}
+                    onCreated={onCreated}
+                    onClose={onClose}
+                  />
+                )}
+              />
+            </div>
           </label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <label>
-              From Warehouse ID
-              <input required value={form.fromWarehouseId} onChange={(e) => setForm({ ...form, fromWarehouseId: e.target.value })} style={field} />
+              From Warehouse
+              <div style={{ marginTop: 5 }}>
+                <SearchableSelect
+                  value={form.fromWarehouseId}
+                  onChange={(val) => setForm({ ...form, fromWarehouseId: val })}
+                  options={warehouseOptions}
+                  placeholder="Select warehouse"
+                  loading={warehousesQuery.isLoading}
+                  createForm={({ onCreated, onClose }) => (
+                    <QuickCreateForm
+                      fields={[{ name: "name", label: "Warehouse Name", required: true, placeholder: "Enter warehouse name" }, { name: "location", label: "Location", placeholder: "Warehouse location/address" }, { name: "description", label: "Description", placeholder: "Brief description" }]}
+                      apiFn={(data) => inventoryApi.createWarehouse(data)}
+                      onCreated={onCreated}
+                      onClose={onClose}
+                    />
+                  )}
+                />
+              </div>
             </label>
             <label>
-              To Warehouse ID
-              <input required value={form.toWarehouseId} onChange={(e) => setForm({ ...form, toWarehouseId: e.target.value })} style={field} />
+              To Warehouse
+              <div style={{ marginTop: 5 }}>
+                <SearchableSelect
+                  value={form.toWarehouseId}
+                  onChange={(val) => setForm({ ...form, toWarehouseId: val })}
+                  options={warehouseOptions}
+                  placeholder="Select warehouse"
+                  loading={warehousesQuery.isLoading}
+                  createForm={({ onCreated, onClose }) => (
+                    <QuickCreateForm
+                      fields={[{ name: "name", label: "Warehouse Name", required: true, placeholder: "Enter warehouse name" }, { name: "location", label: "Location", placeholder: "Warehouse location/address" }, { name: "description", label: "Description", placeholder: "Brief description" }]}
+                      apiFn={(data) => inventoryApi.createWarehouse(data)}
+                      onCreated={onCreated}
+                      onClose={onClose}
+                    />
+                  )}
+                />
+              </div>
             </label>
           </div>
           <label>

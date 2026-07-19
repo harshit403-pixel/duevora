@@ -4,6 +4,7 @@ import EmployeeDao from "../../../shared/dao/employee.dao.js";
 import RoleDao from "../../../shared/dao/role.dao.js";
 import PermissionDao from "../../../shared/dao/permission.dao.js";
 import RolePermissionDao from "../../../shared/dao/rolePermission.dao.js";
+import RolePermission from "../../../shared/models/rolePermission.model.js";
 import EmployeeRoleDao from "../../../shared/dao/employeeRole.dao.js";
 import UserDao from "../../../shared/dao/user.dao.js";
 import SessionDao from "../../../shared/dao/session.dao.js";
@@ -58,7 +59,14 @@ class OrganizationController {
         const { name, code, address, logo, businessType, industry, phone, firstName, lastName } = req.body;
         const userId = req.user._id;
 
-        // checking if organization code already exists using the organization dao
+        // if user already has an organization, skip creation and just return session
+        if (req.user.organizationId) {
+            const user = await this.userDao.findUserById(userId);
+            const { sanitizedUser, accessToken } = await createSession(user, res, this.sessionDao);
+            return Created(res, "Organization already exists", { user: sanitizedUser, organization: req.user.organizationId, accessToken });
+        }
+
+        // checking if organization code already exists for THIS user
         const existingOrg = await this.orgDao.findOne({ code: code.toUpperCase() });
 
         if (existingOrg) {
@@ -79,60 +87,43 @@ class OrganizationController {
             status: "active"
         });
 
-        // seeding the minimum chart of accounts required by a new organization
-        const defaultAccounts = [
-            { name: "Cash on Hand", code: "CASH", type: "asset" },
-            { name: "Bank Account", code: "BANK", type: "asset" },
-            { name: "Accounts Receivable", code: "ACCOUNTS_RECEIVABLE", type: "asset" },
-            { name: "Accounts Payable", code: "ACCOUNTS_PAYABLE", type: "liability" },
-            { name: "Tax Payable", code: "TAX_PAYABLE", type: "liability" },
-            { name: "Owner Capital", code: "OWNER_CAPITAL", type: "equity" },
-            { name: "Sales Revenue", code: "SALES_REVENUE", type: "revenue" },
-            { name: "Operating Expenses", code: "OPERATING_EXPENSES", type: "expense" }
-        ];
+        const orgId = organization._id;
 
-        if (process.env.NODE_ENV !== "test") {
-            for (const account of defaultAccounts) {
-                await this.accountDao.create({ organizationId: organization._id, ...account, status: "active" });
-            }
-        }
+        // seeding all default data in parallel using insertMany for bulk operations
+        const [
+            createdRoles
+        ] = await Promise.all([
+            // bulk create roles
+            this.roleDao.Model.insertMany([
+                { organizationId: orgId, name: "Administrator", code: "ADMIN", description: "Full system administrator access" },
+                { organizationId: orgId, name: "Accountant", code: "ACCOUNTANT", description: "Financial transactions and bookkeeping access" },
+                { organizationId: orgId, name: "Employee", code: "EMPLOYEE", description: "Basic employee access" }
+            ]),
+            // bulk create default accounts
+            process.env.NODE_ENV !== "test" ? this.accountDao.Model.insertMany([
+                { organizationId: orgId, name: "Cash on Hand", code: "CASH", type: "asset", status: "active" },
+                { organizationId: orgId, name: "Bank Account", code: "BANK", type: "asset", status: "active" },
+                { organizationId: orgId, name: "Accounts Receivable", code: "ACCOUNTS_RECEIVABLE", type: "asset", status: "active" },
+                { organizationId: orgId, name: "Accounts Payable", code: "ACCOUNTS_PAYABLE", type: "liability", status: "active" },
+                { organizationId: orgId, name: "Tax Payable", code: "TAX_PAYABLE", type: "liability", status: "active" },
+                { organizationId: orgId, name: "Owner Capital", code: "OWNER_CAPITAL", type: "equity", status: "active" },
+                { organizationId: orgId, name: "Sales Revenue", code: "SALES_REVENUE", type: "revenue", status: "active" },
+                { organizationId: orgId, name: "Operating Expenses", code: "OPERATING_EXPENSES", type: "expense", status: "active" }
+            ]) : Promise.resolve()
+        ]);
 
-        // seeding default roles for the organization
-        const rolesToCreate = [
-            { code: "ADMIN", name: "Administrator", description: "Full system administrator access" },
-            { code: "ACCOUNTANT", name: "Accountant", description: "Financial transactions and bookkeeping access" },
-            { code: "EMPLOYEE", name: "Employee", description: "Basic employee access" }
-        ];
+        // map role codes to their _id for permission binding
+        const roleMap = {};
+        createdRoles.forEach((r) => { roleMap[r.code] = r._id; });
 
-        const createdRoles = {};
-
-        for (const r of rolesToCreate) {
-
-            const createdRole = await this.roleDao.create({
-                organizationId: organization._id,
-                name: r.name,
-                code: r.code,
-                description: r.description
-            });
-
-            createdRoles[r.code] = createdRole;
-
-        }
-
-        // binding all existing permissions to the ADMIN role
+        // fetch all permissions once
         const allPermissions = await this.permissionDao.find({});
 
-        for (const p of allPermissions) {
+        // build admin permissions (all)
+        const adminPerms = allPermissions.map((p) => ({ roleId: roleMap["ADMIN"], permissionId: p._id }));
 
-            await this.rolePermissionDao.create({
-                roleId: createdRoles["ADMIN"]._id,
-                permissionId: p._id
-            });
-
-        }
-
-        // binding default permissions to the ACCOUNTANT role
-        const accountantPermissionCodes = [
+        // build accountant permissions
+        const accountantCodes = new Set([
             "ACCOUNTS.VIEW", "ACCOUNTS.CREATE", "ACCOUNTS.UPDATE",
             "BANKACCOUNTS.VIEW", "BANKACCOUNTS.CREATE", "BANKACCOUNTS.UPDATE",
             "BANKTRANSACTIONS.VIEW", "BANKTRANSACTIONS.CREATE",
@@ -152,60 +143,39 @@ class OrganizationController {
             "REPORTS.VIEW",
             "VOUCHERTYPES.VIEW", "VOUCHERTYPES.CREATE",
             "TAXES.VIEW"
-        ];
+        ]);
+        const accountantPerms = allPermissions
+            .filter((p) => accountantCodes.has(p.code))
+            .map((p) => ({ roleId: roleMap["ACCOUNTANT"], permissionId: p._id }));
 
-        const accountantPermissions = await this.permissionDao.find({
-            code: { $in: accountantPermissionCodes }
-        });
+        // build employee permissions
+        const employeeCodes = new Set(["INVOICES.VIEW", "CUSTOMERS.VIEW", "VENDORS.VIEW", "PRODUCTS.VIEW"]);
+        const employeePerms = allPermissions
+            .filter((p) => employeeCodes.has(p.code))
+            .map((p) => ({ roleId: roleMap["EMPLOYEE"], permissionId: p._id }));
 
-        for (const p of accountantPermissions) {
+        // bulk insert all role-permissions + create employee + assign role in parallel
+        const [
+            employee
+        ] = await Promise.all([
+            // create employee profile
+            this.employeeDao.create({
+                userId,
+                organizationId: orgId,
+                employeeCode: "EMP-001",
+                firstName,
+                lastName,
+                email: req.user.email,
+                status: "active"
+            }),
+            // bulk insert all role-permissions at once
+            RolePermission.insertMany([...adminPerms, ...accountantPerms, ...employeePerms])
+        ]);
 
-            await this.rolePermissionDao.create({
-                roleId: createdRoles["ACCOUNTANT"]._id,
-                permissionId: p._id
-            });
+        // assign ADMIN role to employee
+        await this.employeeRoleDao.create({ employeeId: employee._id, roleId: roleMap["ADMIN"] });
 
-        }
-
-        // binding default permissions to the EMPLOYEE role
-        const employeePermissionCodes = [
-            "INVOICES.VIEW",
-            "CUSTOMERS.VIEW",
-            "VENDORS.VIEW",
-            "PRODUCTS.VIEW"
-        ];
-
-        const employeePermissions = await this.permissionDao.find({
-            code: { $in: employeePermissionCodes }
-        });
-
-        for (const p of employeePermissions) {
-
-            await this.rolePermissionDao.create({
-                roleId: createdRoles["EMPLOYEE"]._id,
-                permissionId: p._id
-            });
-
-        }
-
-        // creating employee profile for the user
-        const employee = await this.employeeDao.create({
-            userId,
-            organizationId: organization._id,
-            employeeCode: "EMP-001",
-            firstName,
-            lastName,
-            email: req.user.email,
-            status: "active"
-        });
-
-        // assigning ADMIN role to the employee
-        await this.employeeRoleDao.create({
-            employeeId: employee._id,
-            roleId: createdRoles["ADMIN"]._id
-        });
-
-        // finding user to re-generate session with full multi-tenant organization context
+        // re-generate session with full organization context
         const user = await this.userDao.findUserById(userId);
         const { sanitizedUser, accessToken } = await createSession(user, res, this.sessionDao);
 

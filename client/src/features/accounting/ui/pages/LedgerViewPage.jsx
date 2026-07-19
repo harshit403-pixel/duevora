@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { accountingApi } from "../../api/accountingApi";
-import { Button, DataTable, PageHeader, EmptyState } from "../../../../app/components/common";
+import { Button, DataTable, PageHeader, EmptyState, SearchableSelect } from "../../../../app/components/common";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 
 export default function LedgerViewPage() {
@@ -35,16 +35,13 @@ export default function LedgerViewPage() {
           <Button variant="secondary" icon={HiOutlineDocumentArrowDown} onClick={() => exportToPdf({ title: "General Ledger", columns: [{key:"date",label:"Date",render:(v)=>v?new Date(v).toLocaleDateString("en-IN"):"—"},{key:"accountId",label:"Account",render:(v)=>v?.name||"—"},{key:"journalEntryId",label:"Journal Entry",render:(v)=>v?.entryNumber||"—"},{key:"debit",label:"Debit",render:(v)=>v?`₹${Number(v).toLocaleString("en-IN",{minimumFractionDigits:2})}`:"—"},{key:"credit",label:"Credit",render:(v)=>v?`₹${Number(v).toLocaleString("en-IN",{minimumFractionDigits:2})}`:"—"}], data: rows, filename: "general-ledger" })}>
             Export PDF
           </Button>
-          <select
+          <SearchableSelect
             value={accountId}
-            onChange={(e) => setAccountId(e.target.value)}
-            style={{ padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: 7, fontSize: 13, minWidth: 180 }}
-          >
-            <option value="">All Accounts</option>
-            {accounts.map((a) => (
-              <option key={a._id} value={a._id}>{a.code} — {a.name}</option>
-            ))}
-          </select>
+            onChange={(val) => setAccountId(val)}
+            options={[{ value: "", label: "All Accounts" }, ...accounts.map((a) => ({ value: a._id, label: `${a.code} — ${a.name}` }))]}
+            placeholder="Filter by account"
+            loading={accountsQuery.isLoading}
+          />
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
 import {
@@ -19,6 +19,7 @@ export default function useOnboarding() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { success, error } = useNotification();
+  const submittingRef = useRef(false);
   const { currentStep, totalSteps, isCompleted, isSubmitting, formData } =
     useAppSelector((state) => state.onboarding);
 
@@ -52,6 +53,8 @@ export default function useOnboarding() {
   );
 
   const submit = useCallback(async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     dispatch(setSubmitting(true));
     try {
       const res = await onboardingApi.onboard(formData);
@@ -67,6 +70,7 @@ export default function useOnboarding() {
     } catch (err) {
       const msg = err.response?.data?.message || "Failed to create organization";
       error(msg);
+      submittingRef.current = false;
     } finally {
       dispatch(setSubmitting(false));
     }

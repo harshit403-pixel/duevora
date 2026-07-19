@@ -53,6 +53,35 @@
   background: #1d4ed8;
 }
 
+.loading {
+  pointer-events: none;
+}
+
+.loading.submitButton {
+  background: #2563eb;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 @media (max-width: 480px) {
   .button {
     padding: 12px 24px;

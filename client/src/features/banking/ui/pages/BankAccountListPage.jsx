@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { bankingApi } from "../../api/bankingApi";
 import { accountingApi } from "../../../accounting/api/accountingApi";
-import { Button, DataTable, Modal, PageHeader, Tabs } from "../../../../app/components/common";
+import { Button, DataTable, Modal, PageHeader, Tabs, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 
 const field = { display: "block", boxSizing: "border-box", width: "100%", marginTop: 5, padding: 9, border: "1px solid #cbd5e1", borderRadius: 7 };
@@ -62,7 +62,33 @@ export default function BankAccountListPage() {
             </>
           ) : (
             <>
-              <label>Bank Account<select required value={tx.bankAccountId} onChange={(e) => setTx({ ...tx, bankAccountId: e.target.value })} style={field}><option value="">Select account</option>{banks.map((b) => <option key={b._id} value={b._id}>{b.bankName} — {b.accountNumber}</option>)}</select></label>
+              <label>Bank Account
+                <div style={{ marginTop: 5 }}>
+                  <SearchableSelect
+                    value={tx.bankAccountId}
+                    onChange={(val) => setTx({ ...tx, bankAccountId: val })}
+                    options={banks.map((b) => ({ value: b._id, label: `${b.bankName} — ${b.accountNumber}` }))}
+                    placeholder="Select bank account"
+                    loading={accounts.isLoading}
+                    createForm={({ onCreated, onClose }) => (
+                      <QuickCreateForm
+                        fields={[
+                          { name: "bankName", label: "Bank Name", required: true, placeholder: "Enter bank name" },
+                          { name: "accountNumber", label: "Account Number", required: true, placeholder: "Account number" },
+                          { name: "accountType", label: "Account Type", placeholder: "savings, current, etc." },
+                          { name: "branch", label: "Branch", placeholder: "Branch name" },
+                          { name: "ifscCode", label: "IFSC / Routing Code", placeholder: "IFSC or routing number" },
+                          { name: "openingBalance", label: "Opening Balance", type: "number", placeholder: "0.00" },
+                          { name: "notes", label: "Notes", placeholder: "Additional notes", type: "textarea" },
+                        ]}
+                        apiFn={(data) => bankingApi.createBankAccount(data)}
+                        onCreated={onCreated}
+                        onClose={onClose}
+                      />
+                    )}
+                  />
+                </div>
+              </label>
               <label>Date<input required type="date" value={tx.transactionDate} onChange={(e) => setTx({ ...tx, transactionDate: e.target.value })} style={field} /></label>
               <label>Type<select value={tx.type} onChange={(e) => setTx({ ...tx, type: e.target.value })} style={field}><option value="deposit">Deposit</option><option value="withdrawal">Withdrawal</option></select></label>
               <label>Amount<input required type="number" min="0.01" step="0.01" value={tx.amount} onChange={(e) => setTx({ ...tx, amount: e.target.value })} style={field} /></label>

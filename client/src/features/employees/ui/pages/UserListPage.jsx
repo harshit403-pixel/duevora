@@ -11,6 +11,8 @@ import {
   StatusBadge,
   Avatar,
   AccessDenied,
+  SearchableSelect,
+  QuickCreateForm,
 } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
@@ -352,19 +354,22 @@ export default function UserListPage() {
             </div>
             <div className={s.formGroup}>
               <label className={s.formLabel}>Assign System Role</label>
-              <select
-                required
-                className={s.formSelect}
-                value={inviteRoleId}
-                onChange={(e) => setInviteRoleId(e.target.value)}
-              >
-                <option value="">Select a role...</option>
-                {roles.map((r) => (
-                  <option key={r._id} value={r._id}>
-                    {r.name}
-                  </option>
-                ))}
-              </select>
+              <div style={{ marginTop: 5 }}>
+                <SearchableSelect
+                  value={inviteRoleId}
+                  onChange={(val) => setInviteRoleId(val)}
+                  options={roles.map((r) => ({ value: r._id, label: r.name }))}
+                  placeholder="Select a role..."
+                  createForm={({ onCreated, onClose }) => (
+                    <QuickCreateForm
+                      fields={[{ name: "name", label: "Role Name", required: true, placeholder: "e.g. Manager" }, { name: "description", label: "Description", placeholder: "Role description" }]}
+                      apiFn={(data) => rolesApi.create(data)}
+                      onCreated={onCreated}
+                      onClose={onClose}
+                    />
+                  )}
+                />
+              </div>
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 24 }}>
               <Button onClick={() => setIsInviteOpen(false)} variant="secondary">Cancel</Button>

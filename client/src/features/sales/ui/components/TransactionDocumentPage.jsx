@@ -6,7 +6,7 @@ import { vendorsApi } from "../../../vendors/api/vendorsApi";
 import { productsApi } from "../../../products/api/productsApi";
 import { salesApi } from "../../api/salesApi";
 import { purchasesApi } from "../../../purchases/api/purchasesApi";
-import { Button, PageHeader, DataTable, StatusBadge } from "../../../../app/components/common";
+import { Button, PageHeader, DataTable, StatusBadge, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 
@@ -188,7 +188,34 @@ export default function TransactionDocumentPage({ title, subtitle, party = "cust
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
             <label>{title.slice(0, -1)} number<div style={{ display: "flex", gap: 6 }}><input required value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} style={inputStyle}/><Button type="button" variant="secondary" onClick={generateNumber} style={{ marginTop: 5, whiteSpace: "nowrap" }}><HiArrowPath /> Generate</Button></div></label>
             <label>Date<input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} style={inputStyle}/></label>
-            <label>{partyName}<select required value={form.partyId} onChange={(e) => setForm({ ...form, partyId: e.target.value })} style={inputStyle}><option value="">Select {partyName.toLowerCase()}</option>{partyRows.map((row) => <option key={row._id} value={row._id}>{row.displayName || row.name || row.companyName || row.email}</option>)}</select></label>
+            <label>{partyName}<div style={{ marginTop: 5 }}><SearchableSelect
+              value={form.partyId}
+              onChange={(val) => setForm({ ...form, partyId: val })}
+              options={partyRows.map((row) => ({ value: row._id, label: row.displayName || row.name || row.companyName || row.email }))}
+              placeholder={`Select ${partyName.toLowerCase()}`}
+              loading={parties.isLoading}
+              createForm={({ onCreated, onClose }) => (
+                <QuickCreateForm
+                  fields={[
+                    { name: "name", label: `${partyName} Name`, required: true, placeholder: `Enter ${partyName.toLowerCase()} name` },
+                    { name: "email", label: "Email", type: "email", required: true, placeholder: "email@example.com" },
+                    { name: "phone", label: "Phone", placeholder: "+1 (555) 000-0000" },
+                    { name: "company", label: "Company", placeholder: "Company name" },
+                    { name: "taxId", label: "Tax ID / GSTIN", placeholder: "Tax identification number" },
+                    { name: "address", label: "Address", placeholder: "Full address", type: "textarea" },
+                    { name: "city", label: "City", placeholder: "City" },
+                    { name: "state", label: "State / Region", placeholder: "State or region" },
+                    { name: "postalCode", label: "Postal Code", placeholder: "Postal code" },
+                    { name: "country", label: "Country", placeholder: "Country" },
+                    { name: "notes", label: "Notes", placeholder: "Additional notes", type: "textarea" },
+                  ]}
+                  apiFn={(data) => party === "customer" ? customersApi.create(data) : vendorsApi.create(data)}
+                  onCreated={onCreated}
+                  onClose={onClose}
+                />
+              )}
+              createLabel={`Create new ${partyName.toLowerCase()}`}
+            /></div></label>
           </div>
           
           {kind === "invoice" && (
@@ -202,10 +229,42 @@ export default function TransactionDocumentPage({ title, subtitle, party = "cust
               </div>
               {form.lines.map((line, i) => (
                 <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 110px 130px 35px", gap: 9 }}>
-                  <select required value={line.productId} onChange={(e) => updateLine(i, "productId", e.target.value)} style={inputStyle}>
-                    <option value="">Select product</option>
-                    {productRows.map((p) => <option key={p._id} value={p._id}>{p.name || p.productName || p.sku}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={line.productId}
+                    onChange={(val) => {
+                      const selected = productRows.find((p) => p._id === val);
+                      setForm({
+                        ...form,
+                        lines: form.lines.map((line, index) =>
+                          index === i
+                            ? { ...line, productId: val, unitPrice: selected?.price || line.unitPrice }
+                            : line
+                        ),
+                      });
+                    }}
+                    options={productRows.map((p) => ({ value: p._id, label: p.name || p.productName || p.sku }))}
+                    placeholder="Select product"
+                    loading={products.isLoading}
+                    createForm={({ onCreated, onClose }) => (
+                      <QuickCreateForm
+                        fields={[
+                          { name: "name", label: "Product Name", required: true, placeholder: "Enter product name" },
+                          { name: "sku", label: "SKU", required: true, placeholder: "Stock keeping unit" },
+                          { name: "description", label: "Description", placeholder: "Product description", type: "textarea" },
+                          { name: "category", label: "Category", placeholder: "Product category" },
+                          { name: "unit", label: "Unit", placeholder: "e.g. pcs, kg, litre" },
+                          { name: "sellingPrice", label: "Selling Price", type: "number", placeholder: "0.00" },
+                          { name: "costPrice", label: "Cost Price", type: "number", placeholder: "0.00" },
+                          { name: "quantity", label: "Opening Stock", type: "number", placeholder: "0" },
+                          { name: "lowStockAlert", label: "Low Stock Alert", type: "number", placeholder: "Minimum stock level" },
+                        ]}
+                        apiFn={(data) => productsApi.create(data)}
+                        onCreated={onCreated}
+                        onClose={onClose}
+                      />
+                    )}
+                    createLabel="Create new product"
+                  />
                   <input required type="number" min="1" value={line.quantity} onChange={(e) => updateLine(i, "quantity", e.target.value)} style={inputStyle}/>
                   <input required type="number" min="0" step="0.01" value={line.unitPrice} onChange={(e) => updateLine(i, "unitPrice", e.target.value)} style={inputStyle}/>
                   <button type="button" disabled={form.lines.length === 1} onClick={() => setForm({ ...form, lines: form.lines.filter((_, index) => index !== i) })} style={{ border: 0, background: "none", color: "#dc2626", cursor: "pointer" }}><HiTrash /></button>

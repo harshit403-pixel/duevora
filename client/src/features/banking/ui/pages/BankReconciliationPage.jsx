@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { bankingApi } from "../../api/bankingApi";
-import { PageHeader, Button, DataTable, StatusBadge, Modal } from "../../../../app/components/common";
+import { PageHeader, Button, DataTable, StatusBadge, Modal, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 import { HiOutlineDocumentArrowDown } from "react-icons/hi2";
@@ -90,7 +90,33 @@ export default function BankReconciliationPage() {
 
       <Modal isOpen={isReconcileOpen} onClose={() => setIsReconcileOpen(false)} title="Bank Reconciliation">
         <form onSubmit={(e) => { e.preventDefault(); reconcile.mutate({ ...form, closingBalance: Number(form.closingBalance) }); }} style={{ display: "grid", gap: 14 }}>
-          <label>Bank Account<select required value={form.bankAccountId} onChange={(e) => setForm({ ...form, bankAccountId: e.target.value })} style={input}><option value="">Select account</option>{bankAccounts.map((ba) => <option key={ba._id} value={ba._id}>{ba.bankName} — {ba.accountNumber}</option>)}</select></label>
+          <label>Bank Account
+            <div style={{ marginTop: 5 }}>
+              <SearchableSelect
+                value={form.bankAccountId}
+                onChange={(val) => setForm({ ...form, bankAccountId: val })}
+                options={bankAccounts.map((ba) => ({ value: ba._id, label: `${ba.bankName} — ${ba.accountNumber}` }))}
+                placeholder="Select bank account"
+                loading={isLoading}
+                createForm={({ onCreated, onClose }) => (
+                  <QuickCreateForm
+                    fields={[
+                      { name: "bankName", label: "Bank Name", required: true, placeholder: "Enter bank name" },
+                      { name: "accountNumber", label: "Account Number", required: true, placeholder: "Account number" },
+                      { name: "accountType", label: "Account Type", placeholder: "savings, current, etc." },
+                      { name: "branch", label: "Branch", placeholder: "Branch name" },
+                      { name: "ifscCode", label: "IFSC / Routing Code", placeholder: "IFSC or routing number" },
+                      { name: "openingBalance", label: "Opening Balance", type: "number", placeholder: "0.00" },
+                      { name: "notes", label: "Notes", placeholder: "Additional notes", type: "textarea" },
+                    ]}
+                    apiFn={(data) => bankingApi.createBankAccount(data)}
+                    onCreated={onCreated}
+                    onClose={onClose}
+                  />
+                )}
+              />
+            </div>
+          </label>
           <label>Statement Date<input required type="date" value={form.statementDate} onChange={(e) => setForm({ ...form, statementDate: e.target.value })} style={input} /></label>
           <label>Closing Balance<input required type="number" step="0.01" value={form.closingBalance} onChange={(e) => setForm({ ...form, closingBalance: e.target.value })} style={input} /></label>
           <label>Notes<textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} style={input} /></label>

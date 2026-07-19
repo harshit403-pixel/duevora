@@ -32,8 +32,8 @@ export default function ProductDetailPage() {
         </div>
         <div className={s.card}>
           <h3 className={s.cardTitle}>Pricing & Stock</h3>
-          <div className={s.field}><span className={s.label}>Selling Price</span><span className={s.value}>{product.sellingPrice ? `$${Number(product.sellingPrice).toFixed(2)}` : "-"}</span></div>
-          <div className={s.field}><span className={s.label}>Cost Price</span><span className={s.value}>{product.costPrice ? `$${Number(product.costPrice).toFixed(2)}` : "-"}</span></div>
+          <div className={s.field}><span className={s.label}>Selling Price</span><span className={s.value}>{product.price ? `$${Number(product.price).toFixed(2)}` : "-"}</span></div>
+          <div className={s.field}><span className={s.label}>Cost Price</span><span className={s.value}>{product.cost ? `$${Number(product.cost).toFixed(2)}` : "-"}</span></div>
           <div className={s.field}><span className={s.label}>Stock</span><span className={s.value}>{product.quantity ?? "-"}</span></div>
           <div className={s.field}><span className={s.label}>Low Stock Alert</span><span className={s.value}>{product.lowStockAlert ?? "-"}</span></div>
         </div>
