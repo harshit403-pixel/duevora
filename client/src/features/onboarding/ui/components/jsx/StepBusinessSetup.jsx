@@ -4,7 +4,7 @@ import styles from "./StepFields.module.css";
 export default function StepBusinessSetup({ formData, errors, onChange }) {
   return (
     <div className={styles.fields}>
-      <FormField label="Business Type" optional>
+      <FormField label="Business Type" optional error={errors.businessType}>
         <TextInput
           name="businessType"
           placeholder="e.g. LLC, Corporation, Sole Proprietor"
@@ -13,7 +13,7 @@ export default function StepBusinessSetup({ formData, errors, onChange }) {
         />
       </FormField>
 
-      <FormField label="Industry" optional>
+      <FormField label="Industry" optional error={errors.industry}>
         <TextInput
           name="industry"
           placeholder="e.g. Technology, Retail, Services"
@@ -22,7 +22,7 @@ export default function StepBusinessSetup({ formData, errors, onChange }) {
         />
       </FormField>
 
-      <FormField label="Phone Number" optional>
+      <FormField label="Phone Number" optional error={errors.phone}>
         <TextInput
           name="phone"
           placeholder="+1 (555) 000-0000"

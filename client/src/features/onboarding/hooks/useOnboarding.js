@@ -55,13 +55,14 @@ export default function useOnboarding() {
     dispatch(setSubmitting(true));
     try {
       const res = await onboardingApi.onboard(formData);
-      const { accessToken } = res.data;
+      const payload = res.data.data || res.data;
+      const { accessToken } = payload;
       if (accessToken) {
         setAccessToken(accessToken);
-        dispatch(setCredentials({ user: res.data.user || res.data.sanitizedUser, accessToken }));
+        dispatch(setCredentials({ user: payload.user || payload.sanitizedUser, accessToken }));
       }
       dispatch(setCompleted());
-      success("Organization created successfully");
+      success(res.data.message || "Organization created successfully");
       navigate("/dashboard", { replace: true });
     } catch (err) {
       const msg = err.response?.data?.message || "Failed to create organization";

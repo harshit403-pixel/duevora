@@ -25,19 +25,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 18px 10px 12px;
+  border-radius: 12px;
 }
 
 .brandIcon {
   width: 36px;
   height: 36px;
-  background: var(--color-primary);
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 800;
-  font-size: 16px;
+  object-fit: contain;
 }
 
 .brandText {

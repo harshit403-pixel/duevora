@@ -51,7 +51,7 @@ class OrganizationController {
     // onboard a new organization
     onboard = async (req, res) => {
 
-        const { name, code, address, logo, firstName, lastName } = req.body;
+        const { name, code, address, logo, businessType, industry, phone, firstName, lastName } = req.body;
         const userId = req.user._id;
 
         // checking if organization code already exists using the organization dao
@@ -69,6 +69,9 @@ class OrganizationController {
             code: code.toUpperCase(),
             address,
             logo,
+            businessType,
+            industry,
+            phone,
             status: "active"
         });
 

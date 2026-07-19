@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentStep: 0,
-  totalSteps: 4,
+  totalSteps: 5,
   isCompleted: false,
   isSubmitting: false,
   formData: {
@@ -10,6 +10,9 @@ const initialState = {
     code: "",
     address: "",
     logo: "",
+    businessType: "",
+    industry: "",
+    phone: "",
     firstName: "",
     lastName: "",
   },

@@ -1,7 +1,7 @@
 .section {
   position: relative;
   background: #fff;
-  padding: 28px 28px 24px;
+  padding: 32px 36px 28px;
   border-bottom: 2px dashed #d1d5db;
 }
 
@@ -19,7 +19,7 @@
 }
 
 .stepNumber {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   color: var(--color-accent);
   margin: 0 0 2px 0;
@@ -27,16 +27,16 @@
 }
 
 .stepTitle {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--color-primary);
   margin: 0 0 4px 0;
 }
 
 .stepDesc {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-text-secondary);
-  margin: 0 0 20px 0;
+  margin: 0 0 24px 0;
   line-height: 1.4;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .sectionActive {
-  min-height: 320px;
+  min-height: 360px;
 }
 
 /* Receipt paper texture */
@@ -102,7 +102,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 8px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -135,6 +135,20 @@
 
 @media (max-width: 768px) {
   .section {
+    padding: 24px 28px 22px;
+  }
+
+  .stepNumber {
+    font-size: 26px;
+  }
+
+  .stepTitle {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
     padding: 20px 20px 18px;
   }
 
@@ -145,22 +159,8 @@
   .stepTitle {
     font-size: 16px;
   }
-}
-
-@media (max-width: 480px) {
-  .section {
-    padding: 16px 14px 14px;
-  }
-
-  .stepNumber {
-    font-size: 20px;
-  }
-
-  .stepTitle {
-    font-size: 14px;
-  }
 
   .stepDesc {
-    font-size: 12px;
+    font-size: 13px;
   }
 }
