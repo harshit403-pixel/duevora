@@ -10,6 +10,8 @@ import {
   HiOutlineShoppingBag,
   HiOutlineSquares2X2,
   HiOutlineUserGroup,
+  HiOutlineCurrencyDollar,
+  HiOutlineArrowTrendingUp,
 } from "react-icons/hi2";
 import ReceiptEdge from "../../../../auth/ui/components/jsx/ReceiptEdge";
 import logoIcon from "../../../../../assets/logo.png";
@@ -19,15 +21,16 @@ import SidebarItem from "./SidebarItem";
 
 const navigationItems = [
   { icon: HiOutlineHome, label: "Dashboard", to: "/dashboard" },
-  { icon: HiOutlineReceiptPercent, label: "Transactions", to: "/dashboard/transactions" },
-  { icon: HiOutlineBanknotes, label: "Sales", to: "/dashboard/sales" },
-  { icon: HiOutlineShoppingBag, label: "Purchases", to: "/dashboard/purchases" },
+  { icon: HiOutlineBanknotes, label: "Customers", to: "/dashboard/customers" },
+  { icon: HiOutlineShoppingBag, label: "Vendors", to: "/dashboard/vendors" },
+  { icon: HiOutlineSquares2X2, label: "Products", to: "/dashboard/products" },
+  { icon: HiOutlineReceiptPercent, label: "Quotations", to: "/dashboard/quotations" },
   { icon: HiOutlineDocumentText, label: "Invoices", to: "/dashboard/invoices" },
-  { icon: HiOutlineCreditCard, label: "Expenses", to: "/dashboard/expenses" },
-  { icon: HiOutlineBuildingStorefront, label: "Banking", to: "/dashboard/banking" },
-  { icon: HiOutlineChartBarSquare, label: "Reports", to: "/dashboard/reports" },
+  { icon: HiOutlineCreditCard, label: "Purchases", to: "/dashboard/purchases" },
+  { icon: HiOutlineCurrencyDollar, label: "Accounts", to: "/dashboard/accounts" },
+  { icon: HiOutlineBuildingStorefront, label: "Inventory", to: "/dashboard/inventory" },
+  { icon: HiOutlineArrowTrendingUp, label: "Reports", to: "/dashboard/reports" },
   { icon: HiOutlineUserGroup, label: "Employees", to: "/dashboard/employees" },
-  { icon: HiOutlineSquares2X2, label: "Inventory", to: "/dashboard/inventory" },
   { icon: HiOutlineCog6Tooth, label: "Settings", to: "/dashboard/settings" },
 ];
 

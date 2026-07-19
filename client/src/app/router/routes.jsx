@@ -38,8 +38,10 @@ import SettingsPage from "../../features/settings/ui/pages/SettingsPage";
 import ReportsPage from "../../features/reports/ui/pages/ReportsPage";
 // Audit Logs
 import AuditLogListPage from "../../features/auditLogs/ui/pages/AuditLogListPage";
-// Notifications
-import NotificationListPage from "../../features/notifications/ui/pages/NotificationListPage";
+// Common pages
+import NotFoundPage from "../components/common/pages/NotFoundPage";
+import NotificationsPage from "../components/common/pages/NotificationsPage";
+import ProfilePage from "../components/common/pages/ProfilePage";
 
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
@@ -155,9 +157,18 @@ export const routes = [
           { path: "/dashboard/audit-logs", element: <AuditLogListPage /> },
 
           // Notifications
-          { path: "/dashboard/notifications", element: <NotificationListPage /> },
+          { path: "/dashboard/notifications", element: <NotificationsPage /> },
+
+          // Profile
+          { path: "/dashboard/profile", element: <ProfilePage /> },
         ],
       },
     ],
+  },
+
+  // 404
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ];
