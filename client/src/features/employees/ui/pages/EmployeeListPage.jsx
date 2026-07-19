@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiOutlineUserPlus, HiPlus, HiOutlineClipboard, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { departmentsApi, employeesApi, rolesApi } from "../../api/employeesApi";
-import { Button, DataTable, Modal, PageHeader, Tabs } from "../../../../app/components/common";
+import { Button, DataTable, Modal, PageHeader, Tabs, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 
 const input = { display: "block", boxSizing: "border-box", width: "100%", padding: "9px", marginTop: 5, border: "1px solid #cbd5e1", borderRadius: 7 };
@@ -97,10 +97,23 @@ export default function EmployeeListPage() {
       ) : (
         <form onSubmit={handleGenerate} style={{ display: "grid", gap: 13 }}>
           <label>Role
-            <select required value={roleId} onChange={(e) => setRoleId(e.target.value)} style={input}>
-              <option value="">Select role</option>
-              {roleRows.map((role) => <option key={role._id} value={role._id}>{role.name}</option>)}
-            </select>
+            <div style={{ marginTop: 5 }}>
+              <SearchableSelect
+                value={roleId}
+                onChange={(val) => setRoleId(val)}
+                options={roleRows.map((r) => ({ value: r._id, label: r.name }))}
+                placeholder="Select role"
+                loading={roles.isLoading}
+                createForm={({ onCreated, onClose }) => (
+                    <QuickCreateForm
+                      fields={[{ name: "name", label: "Role Name", required: true, placeholder: "e.g. Manager" }, { name: "description", label: "Description", placeholder: "Role description" }]}
+                      apiFn={(data) => rolesApi.create(data)}
+                    onCreated={onCreated}
+                    onClose={onClose}
+                  />
+                )}
+              />
+            </div>
           </label>
           <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>The selected role is applied to the invitation. Generating the link allows you to share it directly or send email invites.</p>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus, HiChevronDown, HiChevronRight, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 import { accountingApi } from "../../api/accountingApi";
-import { Button, EmptyState, Modal, PageHeader } from "../../../../app/components/common";
+import { Button, EmptyState, Modal, PageHeader, SearchableSelect } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 
 const TYPES = ["asset", "liability", "equity", "revenue", "expense"];
@@ -210,12 +210,15 @@ export default function AccountTreePage() {
           </label>
           <label>
             Parent account (optional)
-            <select value={form.parentId} onChange={(e) => setForm({ ...form, parentId: e.target.value })} style={field}>
-              <option value="">None — top level</option>
-              {accounts.map((a) => (
-                <option key={a._id} value={a._id}>{a.code} — {a.name}</option>
-              ))}
-            </select>
+            <div style={{ marginTop: 6 }}>
+              <SearchableSelect
+                value={form.parentId}
+                onChange={(val) => setForm({ ...form, parentId: val })}
+                options={[{ value: "", label: "None — top level" }, ...accounts.map((a) => ({ value: a._id, label: `${a.code} — ${a.name}` }))]}
+                placeholder="Select parent..."
+                loading={false}
+              />
+            </div>
           </label>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>

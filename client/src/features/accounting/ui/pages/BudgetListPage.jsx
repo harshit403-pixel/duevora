@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 import { accountingApi } from "../../api/accountingApi";
-import { Button, DataTable, Modal, PageHeader, EmptyState } from "../../../../app/components/common";
+import { Button, DataTable, Modal, PageHeader, EmptyState, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 
 const emptyForm = { name: "", amount: "", accountId: "", startDate: "", endDate: "", description: "" };
@@ -86,12 +86,24 @@ export default function BudgetListPage() {
           </label>
           <label>
             Account (optional)
-            <select value={form.accountId} onChange={(e) => setForm({ ...form, accountId: e.target.value })} style={field}>
-              <option value="">Select account</option>
-              {accounts.map((a) => (
-                <option key={a._id} value={a._id}>{a.code} — {a.name}</option>
-              ))}
-            </select>
+            <div style={{ marginTop: 6 }}>
+              <SearchableSelect
+                value={form.accountId}
+                onChange={(val) => setForm({ ...form, accountId: val })}
+                options={accounts.map((a) => ({ value: a._id, label: `${a.code} — ${a.name}` }))}
+                placeholder="Select account"
+                loading={accountsQuery.isLoading}
+                createForm={({ onCreated, onClose }) => (
+                  <QuickCreateForm
+                    fields={[{ name: "code", label: "Account Code", required: true, placeholder: "e.g. ACC001" }, { name: "name", label: "Account Name", required: true, placeholder: "Account name" }, { name: "type", label: "Account Type", required: true, placeholder: "asset, liability, equity, revenue, expense" }, { name: "description", label: "Description", placeholder: "Brief description" }]}
+                    apiFn={(data) => accountingApi.createAccount(data)}
+                    onCreated={onCreated}
+                    onClose={onClose}
+                  />
+                )}
+                createLabel="Create new account"
+              />
+            </div>
           </label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <label>

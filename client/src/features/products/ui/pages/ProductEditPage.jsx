@@ -31,7 +31,7 @@ export default function ProductEditPage() {
       setValues({
         name: product.name || "", sku: product.sku || "", description: product.description || "",
         category: product.category || "", unit: product.unit || "",
-        sellingPrice: product.sellingPrice || "", costPrice: product.costPrice || "",
+        sellingPrice: product.price || "", costPrice: product.cost || "",
         quantity: product.quantity || "", lowStockAlert: product.lowStockAlert || "",
       });
     }

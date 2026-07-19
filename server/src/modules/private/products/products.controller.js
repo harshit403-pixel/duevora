@@ -32,9 +32,13 @@ class ProductsController {
     // create a new product
     createProduct = async (req, res) => {
 
-        // extracting required fields from request body
-        const { name, sku, description, categoryId, unitId, price, cost, status } = req.body;
+        // extracting required fields from request body (accept both frontend and backend field names)
+        const { name, sku, description, categoryId, unitId, category, unit, price, cost, sellingPrice, costPrice, quantity, lowStockAlert, status } = req.body;
         const organizationId = req.user.organizationId;
+
+        // resolving field name aliases (frontend uses sellingPrice/costPrice, backend uses price/cost)
+        const resolvedPrice = sellingPrice ?? price ?? 0;
+        const resolvedCost = costPrice ?? cost ?? 0;
 
         // verifying SKU is unique within organization context
         const existingProduct = await this.productDao.findOne({
@@ -91,8 +95,10 @@ class ProductsController {
             description: description || "",
             categoryId: categoryId || undefined,
             unitId: unitId || undefined,
-            price: price || 0,
-            cost: cost || 0,
+            price: resolvedPrice,
+            cost: resolvedCost,
+            quantity: quantity ?? 0,
+            lowStockAlert: lowStockAlert ?? 0,
             status: status || "active",
             isDeleted: false
         });
@@ -197,9 +203,9 @@ class ProductsController {
     // update product details
     updateProduct = async (req, res) => {
 
-        // extracting product id and update fields from request
+        // extracting product id and update fields from request (accept both frontend and backend field names)
         const { productId } = req.params;
-        const { name, sku, description, categoryId, unitId, price, cost, status } = req.body;
+        const { name, sku, description, categoryId, unitId, category, unit, price, cost, sellingPrice, costPrice, quantity, lowStockAlert, status } = req.body;
         const organizationId = req.user.organizationId;
 
         // verifying target product exists in organization
@@ -271,6 +277,10 @@ class ProductsController {
 
         }
 
+        // resolving field name aliases (frontend uses sellingPrice/costPrice, backend uses price/cost)
+        const resolvedPrice = sellingPrice ?? price;
+        const resolvedCost = costPrice ?? cost;
+
         // updating product record using product dao
         const updatedProduct = await this.productDao.updateById(productId, {
             name: name !== undefined ? name : product.name,
@@ -278,8 +288,10 @@ class ProductsController {
             description: description !== undefined ? description : product.description,
             categoryId: categoryId !== undefined ? categoryId : product.categoryId,
             unitId: unitId !== undefined ? unitId : product.unitId,
-            price: price !== undefined ? price : product.price,
-            cost: cost !== undefined ? cost : product.cost,
+            price: resolvedPrice !== undefined ? resolvedPrice : product.price,
+            cost: resolvedCost !== undefined ? resolvedCost : product.cost,
+            quantity: quantity !== undefined ? quantity : (product.quantity ?? 0),
+            lowStockAlert: lowStockAlert !== undefined ? lowStockAlert : (product.lowStockAlert ?? 0),
             status: status !== undefined ? status : product.status
         });
 

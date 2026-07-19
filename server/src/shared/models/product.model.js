@@ -49,6 +49,16 @@ const productSchema = new mongoose.Schema({
         default: 0,
     },
 
+    quantity: {
+        type: Number,
+        default: 0,
+    },
+
+    lowStockAlert: {
+        type: Number,
+        default: 0,
+    },
+
     status: {
         type: String,
         enum: ["active", "inactive"],

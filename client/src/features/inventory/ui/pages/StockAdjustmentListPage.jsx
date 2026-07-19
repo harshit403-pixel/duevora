@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus, HiCheck, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { inventoryApi } from "../../api/inventoryApi";
-import { Button, DataTable, Modal, PageHeader, StatusBadge } from "../../../../app/components/common";
+import { productsApi } from "../../../products/api/productsApi";
+import { Button, DataTable, Modal, PageHeader, SearchableSelect, StatusBadge, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 
@@ -23,6 +24,12 @@ export default function StockAdjustmentListPage() {
 
   const { data, isLoading } = useQuery({ queryKey: ["stockAdjustments"], queryFn: () => inventoryApi.listStockAdjustments() });
   const items = data?.data || [];
+
+  const warehousesQuery = useQuery({ queryKey: ["warehouses"], queryFn: () => inventoryApi.listWarehouses() });
+  const warehouseOptions = (warehousesQuery.data?.data || []).map((w) => ({ value: w._id, label: w.name || w.warehouseName || "—" }));
+
+  const productsQuery = useQuery({ queryKey: ["products"], queryFn: () => productsApi.list() });
+  const productOptions = (productsQuery.data?.data || []).map((p) => ({ value: p._id, label: p.name || p.sku || "—" }));
 
   const approve = useMutation({
     mutationFn: (id) => inventoryApi.approveStockAdjustment(id),
@@ -108,8 +115,34 @@ export default function StockAdjustmentListPage() {
       <Modal isOpen={open} onClose={() => setOpen(false)} title="Create stock adjustment">
         <form onSubmit={submit} style={{ display: "grid", gap: 14 }}>
           <label>
-            Product ID
-            <input required value={form.productId} onChange={(e) => setForm({ ...form, productId: e.target.value })} style={field} />
+            Product
+            <div style={{ marginTop: 5 }}>
+              <SearchableSelect
+                value={form.productId}
+                onChange={(val) => setForm({ ...form, productId: val })}
+                options={productOptions}
+                placeholder="Select product"
+                loading={productsQuery.isLoading}
+                createForm={({ onCreated, onClose }) => (
+                  <QuickCreateForm
+                    fields={[
+                      { name: "name", label: "Product Name", required: true, placeholder: "Enter product name" },
+                      { name: "sku", label: "SKU", required: true, placeholder: "Stock keeping unit" },
+                      { name: "description", label: "Description", placeholder: "Product description", type: "textarea" },
+                      { name: "category", label: "Category", placeholder: "Product category" },
+                      { name: "unit", label: "Unit", placeholder: "e.g. pcs, kg, litre" },
+                      { name: "sellingPrice", label: "Selling Price", type: "number", placeholder: "0.00" },
+                      { name: "costPrice", label: "Cost Price", type: "number", placeholder: "0.00" },
+                      { name: "quantity", label: "Opening Stock", type: "number", placeholder: "0" },
+                      { name: "lowStockAlert", label: "Low Stock Alert", type: "number", placeholder: "Minimum stock level" },
+                    ]}
+                    apiFn={(data) => productsApi.create(data)}
+                    onCreated={onCreated}
+                    onClose={onClose}
+                  />
+                )}
+              />
+            </div>
           </label>
           <label>
             Quantity
@@ -120,8 +153,24 @@ export default function StockAdjustmentListPage() {
             <input required value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} style={field} />
           </label>
           <label>
-            Warehouse ID (optional)
-            <input value={form.warehouseId} onChange={(e) => setForm({ ...form, warehouseId: e.target.value })} style={field} />
+            Warehouse (optional)
+            <div style={{ marginTop: 5 }}>
+              <SearchableSelect
+                value={form.warehouseId}
+                onChange={(val) => setForm({ ...form, warehouseId: val })}
+                options={warehouseOptions}
+                placeholder="Select warehouse"
+                loading={warehousesQuery.isLoading}
+                createForm={({ onCreated, onClose }) => (
+                  <QuickCreateForm
+                    fields={[{ name: "name", label: "Warehouse Name", required: true, placeholder: "Enter warehouse name" }, { name: "location", label: "Location", placeholder: "Warehouse location/address" }, { name: "description", label: "Description", placeholder: "Brief description" }]}
+                    apiFn={(data) => inventoryApi.createWarehouse(data)}
+                    onCreated={onCreated}
+                    onClose={onClose}
+                  />
+                )}
+              />
+            </div>
           </label>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>

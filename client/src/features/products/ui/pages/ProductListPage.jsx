@@ -12,7 +12,7 @@ import s from "../css/ProductList.module.css";
 const columns = [
   { key: "name", label: "Product", render: (_, row) => <div className={s.productName}>{row.name}</div> },
   { key: "sku", label: "SKU" },
-  { key: "sellingPrice", label: "Price", render: (val) => val ? `$${Number(val).toFixed(2)}` : "-" },
+  { key: "price", label: "Price", render: (val) => val ? `$${Number(val).toFixed(2)}` : "-" },
   { key: "quantity", label: "Stock", render: (val) => val ?? "-" },
   {
     key: "status", label: "Status",
@@ -63,7 +63,7 @@ export default function ProductListPage() {
     <div className={s.page}>
       <PageHeader
         action={<>
-          <Button variant="secondary" icon={HiOutlineDocumentArrowDown} onClick={() => exportToPdf({ data: items, columns: [{key:"name",label:"Name"},{key:"sku",label:"SKU"},{key:"sellingPrice",label:"Price"},{key:"status",label:"Status"}], filename: "products" })}>Export PDF</Button>
+          <Button variant="secondary" icon={HiOutlineDocumentArrowDown} onClick={() => exportToPdf({ data: items, columns: [{key:"name",label:"Name"},{key:"sku",label:"SKU"},{key:"price",label:"Price"},{key:"status",label:"Status"}], filename: "products" })}>Export PDF</Button>
           <Button icon={HiPlus} onClick={() => navigate("/dashboard/products/create")} variant="primary">Add Product</Button>
         </>}
         subtitle="Manage your product catalog and inventory"

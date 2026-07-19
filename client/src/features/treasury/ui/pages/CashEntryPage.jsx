@@ -2,7 +2,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { accountingApi } from "../../../accounting/api/accountingApi";
 import { paymentsApi, receiptsApi } from "../../../purchases/api/purchasesApi";
-import { Button, PageHeader, Tabs } from "../../../../app/components/common";
+import { Button, PageHeader, Tabs, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 import { HiOutlineDocumentArrowDown } from "react-icons/hi2";
 
@@ -36,7 +36,27 @@ export default function CashEntryPage() {
       <form onSubmit={submit} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: 22, display: "grid", gap: 14 }}>
         <label>{tab === "payment" ? "Payment" : "Receipt"} number<input required value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} style={field} /></label>
         <label>Date<input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} style={field} /></label>
-        <label>Ledger account<select required value={form.accountId} onChange={(e) => setForm({ ...form, accountId: e.target.value })} style={field}><option value="">Select account</option>{(accounts.data?.data || []).map((x) => <option key={x._id} value={x._id}>{x.code} — {x.name}</option>)}</select></label>
+        <label>Ledger account<div style={{ marginTop: 5 }}><SearchableSelect
+          value={form.accountId}
+          onChange={(val) => setForm({ ...form, accountId: val })}
+          options={(accounts.data?.data || []).map((x) => ({ value: x._id, label: `${x.code} — ${x.name}` }))}
+          placeholder="Select account"
+          loading={accounts.isLoading}
+          createForm={({ onCreated, onClose }) => (
+            <QuickCreateForm
+              fields={[
+                { name: "code", label: "Account Code", required: true, placeholder: "e.g. ACC001" },
+                { name: "name", label: "Account Name", required: true, placeholder: "Account name" },
+                { name: "type", label: "Account Type", required: true, placeholder: "asset, liability, equity, revenue, expense" },
+                { name: "description", label: "Description", placeholder: "Brief description" },
+              ]}
+              apiFn={(data) => accountingApi.createAccount(data)}
+              onCreated={onCreated}
+              onClose={onClose}
+            />
+          )}
+          createLabel="Create new account"
+        /></div></label>
         <label>Payment method<select value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })} style={field}><option>cash</option><option>bank transfer</option><option>upi</option><option>card</option></select></label>
         <label>Amount<input required type="number" min="0.01" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} style={field} /></label>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus, HiTrash, HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 import { accountingApi } from "../../api/accountingApi";
-import { Button, DataTable, Modal, PageHeader } from "../../../../app/components/common";
+import { Button, DataTable, Modal, PageHeader, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 
 const line = () => ({ accountId: "", debit: "", credit: "" });
 const input = { boxSizing: "border-box", width: "100%", marginTop: 5, padding: "8px", border: "1px solid #cbd5e1", borderRadius: 6 };
@@ -20,8 +20,85 @@ export default function JournalEntryListPage() {
   const balanced = totals.debit > 0 && totals.debit === totals.credit && form.lines.every((item) => item.accountId && (Number(item.debit || 0) > 0 || Number(item.credit || 0) > 0));
   const create = useMutation({ mutationFn: accountingApi.createJournalEntry, onSuccess: () => { qc.invalidateQueries({ queryKey: ["journalEntries"] }); setOpen(false); } });
   const updateLine = (index, key, value) => setForm({ ...form, lines: form.lines.map((item, i) => i === index ? { ...item, [key]: value } : item) });
-  const submit = (e) => { e.preventDefault(); if (balanced) create.mutate({ ...form, date: new Date(form.date).toISOString(), status: "posted", lines: form.lines.map((item) => ({ accountId: item.accountId, debit: Number(item.debit || 0), credit: Number(item.credit || 0) })) }); };
-  const entries = entriesQuery.data?.data || []; const accounts = accountsQuery.data?.data || [];
-  return <div style={{ maxWidth: 1300, margin: "0 auto" }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}><PageHeader title="Journal Entries" subtitle="Create balanced double-entry postings." /><div style={{ display: "flex", gap: 10 }}><Button variant="primary" onClick={() => setOpen(true)} icon={HiPlus}>New journal entry</Button><Button variant="secondary" onClick={() => exportToPdf({ title: "Journal Entries", columns: [{key:"entryNumber",label:"Entry #"},{key:"date",label:"Date",render:(v)=>v?new Date(v).toLocaleDateString():"—"},{key:"narration",label:"Narration"},{key:"status",label:"Status"}], data: entries, filename: "journal-entries" })} icon={HiOutlineDocumentArrowDown}>Export PDF</Button></div></div><DataTable loading={entriesQuery.isLoading} data={entries} onRowClick={(row) => row._id && navigate(`/dashboard/journal-entries/${row._id}`)} columns={[{ key: "entryNumber", label: "Entry #" }, { key: "date", label: "Date", render: (v) => v ? new Date(v).toLocaleDateString() : "—" }, { key: "narration", label: "Narration" }, { key: "status", label: "Status" }]} />
-  <Modal isOpen={open} onClose={() => setOpen(false)} title="Post journal entry"><form onSubmit={submit} style={{ display: "grid", gap: 13 }}><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}><label>Entry number<input required value={form.entryNumber} onChange={(e) => setForm({ ...form, entryNumber: e.target.value })} style={input} /></label><label>Date<input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} style={input} /></label></div><label>Narration<input value={form.narration} onChange={(e) => setForm({ ...form, narration: e.target.value })} style={input} /></label><div><div style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px 32px", gap: 8, fontSize: 12, fontWeight: 700, marginBottom: 6 }}><span>Account</span><span>Debit</span><span>Credit</span><span /></div>{form.lines.map((item, index) => <div key={index} style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px 32px", gap: 8, marginBottom: 8 }}><select required value={item.accountId} onChange={(e) => updateLine(index, "accountId", e.target.value)} style={input}><option value="">Select account</option>{accounts.map((a) => <option key={a._id} value={a._id}>{a.code} — {a.name}</option>)}</select><input type="number" min="0" step="0.01" value={item.debit} onChange={(e) => updateLine(index, "debit", e.target.value)} style={input}/><input type="number" min="0" step="0.01" value={item.credit} onChange={(e) => updateLine(index, "credit", e.target.value)} style={input}/><button type="button" aria-label="Remove line" disabled={form.lines.length === 2} onClick={() => setForm({ ...form, lines: form.lines.filter((_, i) => i !== index) })} style={{ border: 0, background: "none", color: "#dc2626" }}><HiTrash /></button></div>)}</div><Button type="button" variant="secondary" onClick={() => setForm({ ...form, lines: [...form.lines, line()] })}>Add line</Button><div style={{ textAlign: "right", fontWeight: 700, color: balanced ? "#15803d" : "#b45309" }}>Debit: {totals.debit.toFixed(2)} · Credit: {totals.credit.toFixed(2)} {!balanced && "— entries must balance"}</div><div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="primary" disabled={!balanced} loading={create.isPending}>Post entry</Button></div>{create.isError && <small style={{ color: "#b91c1c" }}>{create.error?.response?.data?.message || "Could not post journal entry."}</small>}</form></Modal></div>;
+  const submit = (e) => {
+    e.preventDefault();
+    if (balanced) {
+      create.mutate({
+        ...form,
+        date: new Date(form.date).toISOString(),
+        status: "posted",
+        lines: form.lines.map((item) => ({ accountId: item.accountId, debit: Number(item.debit || 0), credit: Number(item.credit || 0) })),
+      });
+    }
+  };
+  const entries = entriesQuery.data?.data || [];
+  const accounts = accountsQuery.data?.data || [];
+
+  const accountCreateForm = ({ onCreated, onClose }) => (
+    <QuickCreateForm
+      fields={[
+        { name: "code", label: "Account Code", required: true, placeholder: "e.g. ACC001" },
+        { name: "name", label: "Account Name", required: true, placeholder: "Account name" },
+        { name: "type", label: "Account Type", required: true, placeholder: "asset, liability, equity, revenue, expense" },
+        { name: "description", label: "Description", placeholder: "Brief description" },
+      ]}
+      apiFn={(data) => accountingApi.createAccount(data)}
+      onCreated={onCreated}
+      onClose={onClose}
+    />
+  );
+
+  return (
+    <div style={{ maxWidth: 1300, margin: "0 auto" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
+        <PageHeader title="Journal Entries" subtitle="Create balanced double-entry postings." />
+        <div style={{ display: "flex", gap: 10 }}>
+          <Button variant="primary" onClick={() => setOpen(true)} icon={HiPlus}>New journal entry</Button>
+          <Button variant="secondary" onClick={() => exportToPdf({ title: "Journal Entries", columns: [{ key: "entryNumber", label: "Entry #" }, { key: "date", label: "Date", render: (v) => v ? new Date(v).toLocaleDateString() : "-" }, { key: "narration", label: "Narration" }, { key: "status", label: "Status" }], data: entries, filename: "journal-entries" })} icon={HiOutlineDocumentArrowDown}>Export PDF</Button>
+        </div>
+      </div>
+
+      <DataTable loading={entriesQuery.isLoading} data={entries} onRowClick={(row) => row._id && navigate(`/dashboard/journal-entries/${row._id}`)} columns={[{ key: "entryNumber", label: "Entry #" }, { key: "date", label: "Date", render: (v) => v ? new Date(v).toLocaleDateString() : "-" }, { key: "narration", label: "Narration" }, { key: "status", label: "Status" }]} />
+
+      <Modal isOpen={open} onClose={() => setOpen(false)} title="Post journal entry">
+        <form onSubmit={submit} style={{ display: "grid", gap: 13 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <label>Entry number<input required value={form.entryNumber} onChange={(e) => setForm({ ...form, entryNumber: e.target.value })} style={input} /></label>
+            <label>Date<input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} style={input} /></label>
+          </div>
+          <label>Narration<input value={form.narration} onChange={(e) => setForm({ ...form, narration: e.target.value })} style={input} /></label>
+          <div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px 32px", gap: 8, fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
+              <span>Account</span><span>Debit</span><span>Credit</span><span />
+            </div>
+            {form.lines.map((item, index) => (
+              <div key={index} style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px 32px", gap: 8, marginBottom: 8 }}>
+                <SearchableSelect
+                  value={item.accountId}
+                  onChange={(val) => updateLine(index, "accountId", val)}
+                  options={accounts.map((a) => ({ value: a._id, label: `${a.code} - ${a.name}` }))}
+                  placeholder="Select account"
+                  loading={accountsQuery.isLoading}
+                  createForm={accountCreateForm}
+                  createLabel="Create new account"
+                />
+                <input type="number" min="0" step="0.01" value={item.debit} onChange={(e) => updateLine(index, "debit", e.target.value)} style={input} />
+                <input type="number" min="0" step="0.01" value={item.credit} onChange={(e) => updateLine(index, "credit", e.target.value)} style={input} />
+                <button type="button" aria-label="Remove line" disabled={form.lines.length === 2} onClick={() => setForm({ ...form, lines: form.lines.filter((_, i) => i !== index) })} style={{ border: 0, background: "none", color: "#dc2626" }}><HiTrash /></button>
+              </div>
+            ))}
+            <Button type="button" variant="secondary" onClick={() => setForm({ ...form, lines: [...form.lines, line()] })}>Add line</Button>
+          </div>
+          <div style={{ textAlign: "right", fontWeight: 700, color: balanced ? "#15803d" : "#b45309" }}>
+            Debit: {totals.debit.toFixed(2)} / Credit: {totals.credit.toFixed(2)} {!balanced && " - entries must balance"}
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit" variant="primary" disabled={!balanced} loading={create.isPending}>Post entry</Button>
+          </div>
+          {create.isError && <small style={{ color: "#b91c1c" }}>{create.error?.response?.data?.message || "Could not post journal entry."}</small>}
+        </form>
+      </Modal>
+    </div>
+  );
 }

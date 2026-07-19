@@ -16,5 +16,7 @@ export { default as DataTable } from "./jsx/DataTable";
 export { default as FormBuilder } from "./jsx/FormBuilder";
 export { default as Button } from "./jsx/Button";
 export { default as Select } from "./jsx/Select";
+export { default as SearchableSelect } from "./jsx/SearchableSelect";
+export { default as QuickCreateForm } from "./jsx/QuickCreateForm";
 export { default as Avatar } from "./jsx/Avatar";
 export { default as AccessDenied } from "./pages/AccessDenied";

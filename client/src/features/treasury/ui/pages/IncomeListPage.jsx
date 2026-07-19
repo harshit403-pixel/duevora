@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { accountingApi } from "../../../accounting/api/accountingApi";
-import { PageHeader, Button, DataTable, Modal } from "../../../../app/components/common";
+import { PageHeader, Button, DataTable, Modal, SearchableSelect, QuickCreateForm } from "../../../../app/components/common";
 import useNotification from "../../../../app/components/notification/useNotification";
 import { exportToPdf } from "../../../../lib/exportToPdf";
 import { HiOutlineDocumentArrowDown } from "react-icons/hi2";
@@ -49,8 +49,44 @@ export default function IncomeListPage() {
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Record Income">
         <form onSubmit={(e) => { e.preventDefault(); create.mutate({ ...form, amount: Number(form.amount) }); }} style={{ display: "grid", gap: 14 }}>
-          <label>Income Account<select required value={form.incomeAccountId} onChange={(e) => setForm({ ...form, incomeAccountId: e.target.value })} style={input}><option value="">Select account</option>{accounts.filter((a) => a.type === "revenue").map((a) => <option key={a._id} value={a._id}>{a.code} — {a.name}</option>)}</select></label>
-          <label>Bank Account<select required value={form.bankAccountId} onChange={(e) => setForm({ ...form, bankAccountId: e.target.value })} style={input}><option value="">Select bank account</option>{accounts.filter((a) => a.type === "asset").map((a) => <option key={a._id} value={a._id}>{a.code} — {a.name}</option>)}</select></label>
+          <label>Income Account<div style={{ marginTop: 5 }}><SearchableSelect
+            value={form.incomeAccountId}
+            onChange={(val) => setForm({ ...form, incomeAccountId: val })}
+            options={accounts.filter((a) => a.type === "revenue").map((a) => ({ value: a._id, label: `${a.code} — ${a.name}` }))}
+            placeholder="Select account"
+            createForm={({ onCreated, onClose }) => (
+              <QuickCreateForm
+                fields={[
+                  { name: "code", label: "Account Code", required: true, placeholder: "e.g. REV001" },
+                  { name: "name", label: "Account Name", required: true, placeholder: "Revenue account name" },
+                  { name: "description", label: "Description", placeholder: "Brief description of this account" },
+                ]}
+                apiFn={(data) => accountingApi.createAccount({ ...data, type: "revenue" })}
+                onCreated={onCreated}
+                onClose={onClose}
+              />
+            )}
+            createLabel="Create new account"
+          /></div></label>
+          <label>Bank Account<div style={{ marginTop: 5 }}><SearchableSelect
+            value={form.bankAccountId}
+            onChange={(val) => setForm({ ...form, bankAccountId: val })}
+            options={accounts.filter((a) => a.type === "asset").map((a) => ({ value: a._id, label: `${a.code} — ${a.name}` }))}
+            placeholder="Select bank account"
+            createForm={({ onCreated, onClose }) => (
+              <QuickCreateForm
+                fields={[
+                  { name: "code", label: "Account Code", required: true, placeholder: "e.g. REV001" },
+                  { name: "name", label: "Account Name", required: true, placeholder: "Bank/cash account name" },
+                  { name: "description", label: "Description", placeholder: "Brief description of this account" },
+                ]}
+                apiFn={(data) => accountingApi.createAccount({ ...data, type: "asset" })}
+                onCreated={onCreated}
+                onClose={onClose}
+              />
+            )}
+            createLabel="Create new account"
+          /></div></label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <label>Amount<input required type="number" step="0.01" min="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} style={input} /></label>
             <label>Date<input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} style={input} /></label>
